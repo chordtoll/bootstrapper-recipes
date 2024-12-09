@@ -1,0 +1,15 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0
+    owner: oriansj
+    license_file: stage0-posix
+source:
+  stage0-posix-x86:
+    extract: /x86/
+deps:
+  - stage0-posix/mescc-tools-mini-kaem/hex1:latest
+build:
+  single:
+    - /x86/artifact/hex1 /x86/hex2_x86.hex1 /x86/artifact/hex2-0
+artefacts:
+  - /x86/artifact/hex2-0

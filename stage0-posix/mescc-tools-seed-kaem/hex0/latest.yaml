@@ -1,0 +1,17 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0
+    owner: oriansj
+    license_file: stage0-posix
+source: 
+  bootstrap-seeds:
+    extract: /bootstrap-seeds/
+  stage0-posix-x86:
+    extract: /x86/
+mkdirs:
+  - /x86/artifact/
+build:
+  single:
+    - /bootstrap-seeds/POSIX/x86/hex0-seed /x86/hex0_x86.hex0 /x86/artifact/hex0
+artefacts:
+  - /x86/artifact/hex0

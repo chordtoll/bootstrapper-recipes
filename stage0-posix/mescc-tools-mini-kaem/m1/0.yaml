@@ -1,0 +1,26 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0
+    owner: oriansj
+    license_file: stage0-posix
+source:
+  M2libc:
+    extract: /M2libc
+  mescc-tools:
+    extract: /mescc-tools
+deps:
+  - stage0-posix/mescc-tools-mini-kaem/m2-planet:latest
+  - stage0-posix/mescc-tools-mini-kaem/blood-elf:0
+  - stage0-posix/mescc-tools-mini-kaem/catm:latest
+  - stage0-posix/mescc-tools-mini-kaem/m0:latest
+  - stage0-posix/mescc-tools-mini-kaem/hex2:0
+build:
+  single:
+    - /x86/artifact/M2 --architecture x86 -f /M2libc/x86/linux/bootstrap.c -f /M2libc/bootstrappable.c -f /mescc-tools/stringify.c -f /mescc-tools/M1-macro.c --bootstrap-mode --debug -o /x86/artifact/M1-macro-0.M1
+    - /x86/artifact/blood-elf-0 -f /x86/artifact/M1-macro-0.M1 --little-endian -o /x86/artifact/M1-macro-0-footer.M1
+    - /x86/artifact/catm /x86/artifact/M1-macro-0-0.M1 /M2libc/x86/x86_defs.M1  /M2libc/x86/libc-core.M1 /x86/artifact/M1-macro-0.M1 /x86/artifact/M1-macro-0-footer.M1
+    - /x86/artifact/M0 /x86/artifact/M1-macro-0-0.M1 /x86/artifact/M1-macro-0.hex2
+    - /x86/artifact/catm /x86/artifact/M1-macro-0-0.hex2 /M2libc/x86/ELF-x86-debug.hex2 /x86/artifact/M1-macro-0.hex2
+    - /x86/artifact/hex2-0 /x86/artifact/M1-macro-0-0.hex2 /x86/artifact/M1-0
+artefacts:
+  - /x86/artifact/M1-0
