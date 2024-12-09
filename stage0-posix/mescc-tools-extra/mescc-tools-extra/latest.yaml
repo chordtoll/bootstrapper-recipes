@@ -1,0 +1,50 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0
+    owner: oriansj
+    license_file: stage0-posix
+source: 
+  mescc-tools-extra:
+    extract: /mescc-tools-extra
+  M2libc:
+    extract: /M2libc
+  stage0-posix:
+    extract: /stage0-posix/
+mkdirs:
+  - /tmp
+deps:
+  - stage0-posix/mescc-tools-full-kaem/m2-planet:latest:/x86/bin:/bin
+  - stage0-posix/mescc-tools-full-kaem/blood-elf:latest:/x86/bin:/bin
+  - stage0-posix/mescc-tools-mini-kaem/m1:latest:/x86/bin:/bin
+  - stage0-posix/mescc-tools-mini-kaem/hex2:latest:/x86/bin:/bin
+  - stage0-posix/mescc-tools-full-kaem/m2-mesoplanet:latest
+build:
+  single:
+    - cd /mescc-tools-extra
+    - ${CC} sha256sum.c -o ${BINDIR}/sha256sum${EXE_SUFFIX}
+    - ${CC} match.c -o ${BINDIR}/match${EXE_SUFFIX}
+    - ${CC} mkdir.c -o ${BINDIR}/mkdir${EXE_SUFFIX}
+    - ${CC} untar.c -o ${BINDIR}/untar${EXE_SUFFIX}
+    - ${CC} ungz.c -o ${BINDIR}/ungz${EXE_SUFFIX}
+    - ${CC} unbz2.c -o ${BINDIR}/unbz2${EXE_SUFFIX}
+    - ${CC} unxz.c -o ${BINDIR}/unxz${EXE_SUFFIX}
+    - ${CC} catm.c -o ${BINDIR}/catm${EXE_SUFFIX}
+    - ${CC} cp.c -o ${BINDIR}/cp${EXE_SUFFIX}
+    - ${CC} chmod.c -o ${BINDIR}/chmod${EXE_SUFFIX}
+    - ${CC} rm.c -o ${BINDIR}/rm${EXE_SUFFIX}
+    - ${CC} replace.c -o ${BINDIR}/replace${EXE_SUFFIX}
+    - ${CC} wrap.c -o ${BINDIR}/wrap${EXE_SUFFIX}
+artefacts:
+  - /x86/bin/sha256sum
+  - /x86/bin/match
+  - /x86/bin/mkdir
+  - /x86/bin/untar
+  - /x86/bin/ungz
+  - /x86/bin/unbz2
+  - /x86/bin/unxz
+  - /x86/bin/catm
+  - /x86/bin/cp
+  - /x86/bin/chmod
+  - /x86/bin/rm
+  - /x86/bin/replace
+  - /x86/bin/wrap

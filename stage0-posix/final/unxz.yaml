@@ -1,0 +1,11 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0
+    owner: oriansj
+    license_file: stage0-posix
+deps:
+  - stage0-posix/final:all
+build:
+  single: []
+artefacts:
+  - /usr/bin/unxz

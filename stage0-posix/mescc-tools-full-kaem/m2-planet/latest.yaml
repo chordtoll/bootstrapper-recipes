@@ -1,0 +1,23 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0
+    owner: oriansj
+    license_file: stage0-posix
+source: 
+  M2-Planet:
+    extract: /M2-Planet
+  M2libc:
+    extract: /M2libc
+deps:
+  - stage0-posix/mescc-tools-mini-kaem/m2-planet:latest
+  - stage0-posix/mescc-tools-full-kaem/blood-elf:latest
+  - stage0-posix/mescc-tools-mini-kaem/m1:latest
+  - stage0-posix/mescc-tools-mini-kaem/hex2:latest
+build:
+  single:
+    - /x86/artifact/M2 --architecture ${ARCH} -f /M2libc/sys/types.h -f /M2libc/stddef.h -f /M2libc/sys/utsname.h -f /M2libc/${ARCH}/linux/unistd.c -f /M2libc/${ARCH}/linux/fcntl.c -f /M2libc/fcntl.c -f /M2libc/stdlib.c -f /M2libc/stdio.h -f /M2libc/stdio.c -f /M2libc/bootstrappable.c -f /M2-Planet/cc.h -f /M2-Planet/cc_globals.c -f /M2-Planet/cc_reader.c -f /M2-Planet/cc_strings.c -f /M2-Planet/cc_types.c -f /M2-Planet/cc_core.c -f /M2-Planet/cc_macro.c -f /M2-Planet/cc.c --debug -o /x86/artifact/M2-1.M1
+    - /x86/bin/blood-elf ${ENDIAN_FLAG} ${BLOOD_FLAG} -f /x86/artifact/M2-1.M1 -o /x86/artifact/M2-1-footer.M1
+    - /x86/bin/M1 --architecture ${ARCH} ${ENDIAN_FLAG} -f /M2libc/${ARCH}/${ARCH}_defs.M1 -f /M2libc/${ARCH}/libc-full.M1 -f /x86/artifact/M2-1.M1 -f /x86/artifact/M2-1-footer.M1 -o /x86/artifact/M2-1.hex2
+    - /x86/bin/hex2 --architecture ${ARCH} ${ENDIAN_FLAG} --base-address ${BASE_ADDRESS} -f /M2libc/${ARCH}/ELF-${ARCH}-debug.hex2 -f /x86/artifact/M2-1.hex2 -o /x86/bin/M2-Planet
+artefacts:
+  - /x86/bin/M2-Planet
