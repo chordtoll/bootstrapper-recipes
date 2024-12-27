@@ -1,0 +1,45 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  zlib-1.2.13:
+    noextract: /external/distfiles/zlib-1.2.13.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/zlib-1.2.13
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/grep:2.4
+- live-bootstrap/binutils:2.30
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/file:5.44
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/make:4.2.1
+build:
+  unpack_dirname: zlib-1.2.13
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  configure:
+  - ./configure --prefix="${PREFIX}" --libdir="${LIBDIR}" --static
+artefacts:
+- /external/repo/zlib-1.2.13_0.tar.bz2

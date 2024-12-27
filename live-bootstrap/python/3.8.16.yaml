@@ -1,0 +1,140 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2022 fosslinux <fosslinux@aussies.space>
+source:
+  python-3.8.16:
+    noextract: /external/distfiles/Python-3.8.16.tar.xz
+  unicode-UnicodeData-3.2.0:
+    noextract: /external/distfiles/UnicodeData-3.2.0.txt
+  unicode-CompositionExclusions-3.2.0:
+    noextract: /external/distfiles/CompositionExclusions-3.2.0.txt
+  unicode-EastAsianWidth-3.2.0:
+    noextract: /external/distfiles/EastAsianWidth-3.2.0.txt
+  unicode-DerivedCoreProperties-3.2.0:
+    noextract: /external/distfiles/DerivedCoreProperties-3.2.0.txt
+  unicode-DerivedNormalizationProps-3.2.0:
+    noextract: /external/distfiles/DerivedNormalizationProps-3.2.0.txt
+  unicode-LineBreak-3.2.0:
+    noextract: /external/distfiles/LineBreak-3.2.0.txt
+  unicode-SpecialCasing-3.2.0:
+    noextract: /external/distfiles/SpecialCasing-3.2.0.txt
+  unicode-CaseFolding-3.2.0:
+    noextract: /external/distfiles/CaseFolding-3.2.0.txt
+  unicode-Unihan-3.2.0:
+    noextract: /external/distfiles/Unihan-3.2.0.zip
+  unicode-UnicodeData-12.1.0:
+    noextract: /external/distfiles/UnicodeData-12.1.0.txt
+  unicode-CompositionExclusions-12.1.0:
+    noextract: /external/distfiles/CompositionExclusions-12.1.0.txt
+  unicode-EastAsianWidth-12.1.0:
+    noextract: /external/distfiles/EastAsianWidth-12.1.0.txt
+  unicode-DerivedCoreProperties-12.1.0:
+    noextract: /external/distfiles/DerivedCoreProperties-12.1.0.txt
+  unicode-DerivedNormalizationProps-12.1.0:
+    noextract: /external/distfiles/DerivedNormalizationProps-12.1.0.txt
+  unicode-LineBreak-12.1.0:
+    noextract: /external/distfiles/LineBreak-12.1.0.txt
+  unicode-NameAliases-12.1.0:
+    noextract: /external/distfiles/NameAliases-12.1.0.txt
+  unicode-NamedSequences-12.1.0:
+    noextract: /external/distfiles/NamedSequences-12.1.0.txt
+  unicode-SpecialCasing-12.1.0:
+    noextract: /external/distfiles/SpecialCasing-12.1.0.txt
+  unicode-CaseFolding-12.1.0:
+    noextract: /external/distfiles/CaseFolding-12.1.0.txt
+  unicode-Unihan-12.1.0:
+    noextract: /external/distfiles/Unihan-12.1.0.zip
+  unicode-CP437:
+    noextract: /external/distfiles/CP437.TXT
+  rfc3454:
+    noextract: /external/distfiles/rfc3454.txt
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/python-3.8.16
+mkdirs:
+- /external/repo
+- /tmp
+- /dev/shm
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/linux-headers:4.14.341-openela
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/util-linux:2.19.1
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/make:4.2.1
+- live-bootstrap/perl:5.32.1
+- live-bootstrap/automake:1.16.3
+- live-bootstrap/autoconf:2.71
+- live-bootstrap/patch:2.7.6
+- live-bootstrap/zlib:1.2.13
+- live-bootstrap/gcc:4.7.4
+- live-bootstrap/binutils:2.41-pass1
+- live-bootstrap/grep:3.7
+- live-bootstrap/sed:4.8
+- live-bootstrap/musl:1.2.4-pass3
+- live-bootstrap/libffi:3.3
+- live-bootstrap/openssl:3.0.13
+- live-bootstrap/python:2.5.6
+- live-bootstrap/python:3.4.10
+build:
+  unpack_dirname: Python-3.8.16
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - rm Lib/pydoc_data/topics.py
+  - cmd: rm Modules/_ssl_data*.h
+    bash: true
+  - cmd: grep generated -r . -l | grep encodings | xargs rm
+    bash: true
+  - mkdir Tools/unicode/in Tools/unicode/out
+  - mv ../CP437.TXT Tools/unicode/in/
+  - cd Tools/unicode
+  - python -B gencodec.py in/ ../../Lib/encodings/
+  - cd ../..
+  - rm Modules/unicodedata_db.h Modules/unicodename_db.h Objects/unicodetype_db.h
+  - cmd: mv ../*.txt ../*.zip .
+    bash: true
+  - python -B Tools/unicode/makeunicodedata.py
+  - rm Modules/sre_constants.h
+  - cp Lib/sre_constants.py .
+  - python -B sre_constants.py
+  - rm sre_constants.py
+  - mv sre_constants.h Modules/
+  - rm Lib/stringprep.py
+  - cmd: python -B Tools/unicode/mkstringprep.py > Lib/stringprep.py
+    bash: true
+  - autoreconf-2.71 -fi
+  configure:
+  - cmd: MACHDEP=linux ac_sys_system=Linux CPPFLAGS="-U__DATE__ -U__TIME__" LDFLAGS="-L${LIBDIR}"
+      ./configure --build=i386-unknown-linux-musl --host=i386-unknown-linux-musl --prefix="${PREFIX}"
+      --libdir="${LIBDIR}" --with-system-ffi
+    bash: true
+  compile:
+  - rm Modules/_blake2/blake2s_impl.c
+  - cmd: PYTHONDONTWRITEBYTECODE=1 make "${MAKEJOBS}" regen-all
+    bash: true
+  - cmd: PYTHONDONTWRITEBYTECODE=1 make "${MAKEJOBS}" CPPFLAGS="-U__DATE__ -U__TIME__"
+    bash: true
+  install:
+  - default
+  - ln --symbolic --relative "${DESTDIR}${LIBDIR}/python3.8/lib-dynload" "${DESTDIR}${PREFIX}/lib/python3.8/lib-dynload"
+  - ln --symbolic --relative "${DESTDIR}${PREFIX}/bin/python3.8" "${DESTDIR}${PREFIX}/bin/python"
+  - find "${DESTDIR}" -name "*.pyc" -delete
+  - find "${DESTDIR}" -name "*.pyo" -delete
+artefacts:
+- external/repo/python-3.8.16_0.tar.bz2

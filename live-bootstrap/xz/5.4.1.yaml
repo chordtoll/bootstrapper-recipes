@@ -1,0 +1,54 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  xz-5.4.1:
+    noextract: /external/distfiles/xz-5.4.1.tar.bz2
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/xz-5.4.1
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/tar:1.12
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/binutils:2.30
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/make:3.82-pass1
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+build:
+  unpack_dirname: xz-5.4.1
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - find . -name "*.gmo" -delete
+  - rm -rf po4a/man
+  - cmd: AUTOMAKE=automake-1.15 ACLOCAL=aclocal-1.15 AUTOCONF=autoconf-2.69 AUTOM4TE=autom4te-2.69
+      autoreconf-2.69 -f
+    bash: true
+  configure:
+  - ./configure --prefix="${PREFIX}" --disable-shared --disable-nls --build=i386-unknown-linux-musl
+    --libdir="${LIBDIR}"
+artefacts:
+- external/repo/xz-5.4.1_0.tar.bz2

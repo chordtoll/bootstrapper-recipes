@@ -1,0 +1,53 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 2021 fosslinux <fosslinux@aussies.space>
+source:
+  dist-3.5-236:
+    noextract: /external/distfiles/dist_3.5-236.orig.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/dist-3.5-236
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/grep:2.4
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/perl:5.10.1
+build:
+  unpack_dirname: dist-3.5-236
+  patch_dir: patches
+  prepare:
+  - default
+  - bash -c "sed 's/@PERLVER@/5.10.1/' config.sh.in > config.sh"
+  compile:
+  - cd mcon
+  - cmd: ./mconfig.SH
+    bash: true
+  - cmd: perl ../bin/perload -o mconfig > metaconfig
+    bash: true
+  - cd ..
+  - cd kit
+  - cmd: ./manifake.SH
+    bash: true
+  - cd ..
+  install:
+  - mkdir -p "${DESTDIR}${PREFIX}/bin/" "${DESTDIR}${PREFIX}/lib/perl5/5.10.1"
+  - install mcon/metaconfig "${DESTDIR}${PREFIX}/bin/"
+  - install kit/manifake "${DESTDIR}${PREFIX}/bin/"
+  - cp -r mcon/U/ "${DESTDIR}${PREFIX}/lib/perl5/5.10.1/"
+artefacts:
+- /external/repo/dist-3.5-236_0.tar.bz2

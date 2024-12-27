@@ -1,0 +1,118 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 
+      - 2021 Melg Eight <public.melg8@gmail.com>
+      - 2022 Andrius Štikonas <andrius@stikonas.eu>
+      - 2023 fosslinux <fosslinux@aussies.space>
+source:
+  coreutils-9.4:
+    noextract: /external/distfiles/coreutils-9.4.tar.xz
+  gnulib-bb5bb43:
+    noextract: /external/distfiles/gnulib-bb5bb43.tar.gz
+  unicode-UnicodeData-15.0.0:
+    noextract: /external/distfiles/UnicodeData-15.0.0.txt
+  unicode-PropList-15.0.0:
+    noextract: /external/distfiles/PropList-15.0.0.txt
+  unicode-DerivedCoreProperties-15.0.0:
+    noextract: /external/distfiles/DerivedCoreProperties-15.0.0.txt
+  unicode-emoji-data-15.0.0:
+    noextract: /external/distfiles/emoji-data-15.0.0.txt
+  unicode-ArabicShaping-15.0.0:
+    noextract: /external/distfiles/ArabicShaping-15.0.0.txt
+  unicode-Scripts-15.0.0:
+    noextract: /external/distfiles/Scripts-15.0.0.txt
+  unicode-Blocks-15.0.0:
+    noextract: /external/distfiles/Blocks-15.0.0.txt
+  unicode-PropList-3.0.1:
+    noextract: /external/distfiles/PropList-3.0.1.txt
+  unicode-EastAsianWidth-15.0.0:
+    noextract: /external/distfiles/EastAsianWidth-15.0.0.txt
+  unicode-LineBreak-15.0.0:
+    noextract: /external/distfiles/LineBreak-15.0.0.txt
+  unicode-WordBreakProperty-15.0.0:
+    noextract: /external/distfiles/WordBreakProperty-15.0.0.txt
+  unicode-GraphemeBreakProperty-15.0.0:
+    noextract: /external/distfiles/GraphemeBreakProperty-15.0.0.txt
+  unicode-CompositionExclusions-15.0.0:
+    noextract: /external/distfiles/CompositionExclusions-15.0.0.txt
+  unicode-SpecialCasing-15.0.0:
+    noextract: /external/distfiles/SpecialCasing-15.0.0.txt
+  unicode-CaseFolding-15.0.0:
+    noextract: /external/distfiles/CaseFolding-15.0.0.txt
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/coreutils-9.4
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/flex:2.6.4
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/libtool:2.2.4
+- live-bootstrap/binutils:2.30
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/linux-headers:4.14.341-openela
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/make:3.82-pass1
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/util-linux:2.19.1
+- live-bootstrap/libtool:2.4.7
+- live-bootstrap/tar:1.34
+build:
+  unpack_dirname: coreutils-9.4
+  patch_dir: patches
+  prepare:
+  - default
+  - cmd: build-aux/gen-lists-of-programs.sh --autoconf > m4/cu-progs.m4
+    bash: true
+  - cmd: build-aux/gen-lists-of-programs.sh --automake > src/cu-progs.mk
+    bash: true
+  - cmd: build-aux/gen-single-binary.sh src/local.mk > src/single-binary.mk
+    bash: true
+  - touch ChangeLog
+  - cp ../gnulib-bb5bb43/build-aux/po/Makefile.in.in po/Makefile.in.in
+  - cmd: rm ../gnulib-bb5bb43/lib/uniwidth/width*.h
+    bash: true
+  - cmd: rm ../gnulib-bb5bb43/lib/unictype/ctype*.h
+    bash: true
+  - rm ../gnulib-bb5bb43/lib/unicase/tolower.h
+  - cmd: . ../../import-gnulib.sh
+    bash: true
+  - cmd: echo pass1 > .tarball-version
+    bash: true
+  - cmd: AUTOPOINT=true AUTOMAKE=automake-1.15 ACLOCAL=aclocal-1.15 autoreconf-2.69
+      -fi
+    bash: true
+  configure:
+  - cmd: FORCE_UNSAFE_CONFIGURE=1 ./configure CFLAGS="-static" --prefix="${PREFIX}"
+      --build=i386-unknown-linux-musl gl_cv_func_getcwd_path_max="no, but it is partly
+      working" gl_cv_prog_perl="no"
+    bash: true
+  compile:
+  - make "${MAKEJOBS}" PREFIX="${PREFIX}" MAKEINFO="true" GPERF="true"
+  install:
+  - make install PREFIX="${PREFIX}" MAKEINFO="true" DESTDIR="${DESTDIR}"
+artefacts:
+- /external/repo/coreutils-9.4_0.tar.bz2

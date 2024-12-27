@@ -1,0 +1,68 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 
+      - 2021 Paul Dersey <pdersey@gmail.com>
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+      - 2021 Bastian Bittorf <bb@npl.de>
+      - 2022 fosslinux <fosslinux@aussies.space>
+source:
+  bash-5.2.15:
+    noextract: /external/distfiles/bash-5.2.15.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/bash-5.2.15
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/tar:1.12
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/binutils:2.30
+- live-bootstrap/linux-headers:4.14.341-openela
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/make:3.82-pass1
+- live-bootstrap/musl:1.2.4-pass2
+build:
+  unpack_dirname: bash-5.2.15
+  patch_dir: patches
+  prepare:
+  - rm y.tab.c y.tab.h
+  - cmd: rm po/*.gmo
+    bash: true
+  - mv doc/Makefile.in Makefile.in.doc
+  - cmd: rm doc/*
+    bash: true
+  - mv Makefile.in.doc doc/Makefile.in
+  - rm lib/sh/strtoimax.c
+  - touch lib/sh/strtoimax.c
+  - rm configure
+  - autoconf-2.69
+  - bash -c "printf '%s\n%s\n' '#!/bin/sh' 'echo \"#define PIPESIZE 65536\"' >builtins/psize.sh"
+  configure:
+  - ./configure --prefix="${PREFIX}" --without-bash-malloc --disable-nls --build=i386-unknown-linux-musl
+    --enable-static-link bash_cv_dev_stdin=absent bash_cv_dev_fd=whacky
+  compile:
+  - make -j1 PREFIX="${PREFIX}"
+  install:
+  - install -D bash "${DESTDIR}${PREFIX}/bin/bash"
+  - install bash "${DESTDIR}${PREFIX}/bin/sh"
+artefacts:
+- external/repo/bash-5.2.15_0.tar.bz2

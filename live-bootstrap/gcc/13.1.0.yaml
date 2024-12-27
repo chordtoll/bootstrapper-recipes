@@ -1,0 +1,117 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 2023 fosslinux <fosslinux@aussies.space>
+source:
+  gcc-13.1.0:
+    noextract: /external/distfiles/gcc-13.1.0.tar.xz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/gcc-13.1.0
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/flex:2.6.4
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/linux-headers:4.14.341-openela
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/ed:1.4
+- live-bootstrap/bc:1.07.1
+- live-bootstrap/util-linux:2.19.1
+- live-bootstrap/libtool:2.4.7
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/pkg-config:0.29.2
+- live-bootstrap/make:4.2.1
+- live-bootstrap/bison:3.4.2
+- live-bootstrap/flex:2.5.33
+- live-bootstrap/dist:3.5-236
+- live-bootstrap/perl:5.32.1
+- live-bootstrap/patch:2.7.6
+- live-bootstrap/gettext:0.21
+- live-bootstrap/gmp:6.2.1
+- live-bootstrap/mpfr:4.1.0
+- live-bootstrap/mpc:1.2.1
+- live-bootstrap/libarchive:3.5.2
+- live-bootstrap/texinfo:6.7
+- live-bootstrap/zlib:1.2.13
+- live-bootstrap/libatomic_ops:7.6.10
+- live-bootstrap/gc:8.0.4
+- live-bootstrap/gperf:3.1
+- live-bootstrap/grep:3.7
+- live-bootstrap/libffi:3.3
+- live-bootstrap/libunistring:0.9.10
+- live-bootstrap/guile:3.0.9
+- live-bootstrap/sed:4.8
+- live-bootstrap/which:2.21
+- live-bootstrap/autogen:5.18.16
+- live-bootstrap/musl:1.2.4-pass3
+- live-bootstrap/gcc:10.4.0
+- live-bootstrap/binutils:2.41-pass2
+build:
+  unpack_dirname: gcc-13.1.0
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - rm -r zlib
+  - rm gcc/cp/cfns.h
+  - gperf -o -C -E -k '1-6,$' -j1 -D -N 'libc_name_p' -L C++ gcc/cp/cfns.gperf --output-file
+    gcc/cp/cfns.h
+  - autogen Makefile.def
+  - cd fixincludes
+  - ./genfixes
+  - cd ..
+  - cmd: find . -name configure | sed "s:/configure::" | while read d; do pushd "${d}";
+      AUTOMAKE=automake-1.15 ACLOCAL=aclocal-1.15 autoreconf-2.69 -fiv; popd; done
+    bash: true
+  - cp "${PREFIX}/share/automake-1.15/depcomp" .
+  - cmd: BACK="${PWD}"; find . -type d -exec test -e "{}/Makefile.am" -a ! -e "{}/configure"
+      \; -print | while read d; do d="$(readlink -f "${d}")"; cd "${d}"; while [ !
+      -e configure ]; do cd ..; done; automake-1.15 -fai "${d}/Makefile"; cd "${BACK}";
+      done
+    bash: true
+  - rm intl/plural.c
+  - rm -r libgfortran/generated
+  - sed -i 's/@USE_INCLUDED_LIBINTL@/no/' intl/Makefile.in
+  - cd libiberty
+  - cmd: sed -n -e "38,65p" crc32.c > crcgen.c
+    bash: true
+  - gcc -o crcgen crcgen.c
+  - cmd: head -n 69 crc32.c > crc32.c.new
+    bash: true
+  - cmd: ./crcgen >> crc32.c.new
+    bash: true
+  - cmd: tail -n +138 crc32.c >> crc32.c.new
+    bash: true
+  - mv crc32.c.new crc32.c
+  - cd ..
+  - find . -name "*.gmo" -delete
+  - find . -name "*.info" -delete
+  configure:
+  - mkdir build
+  - cd build
+  - cmd: LDFLAGS="-static" ../configure --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --build=i386-unknown-linux-musl --target=i386-unknown-linux-musl --host=i386-unknown-linux-musl
+      --enable-bootstrap --enable-static --disable-plugins --disable-libssp --disable-libsanitizer
+      --program-transform-name= --enable-languages=c,c++ --with-system-zlib --disable-multilib
+      --enable-threads=posix
+    bash: true
+  compile:
+  - make "${MAKEJOBS}" BOOT_LDFLAGS="-static"
+artefacts:
+- external/repo/gcc-13.1.0_0.tar.bz2

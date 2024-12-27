@@ -1,0 +1,72 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 
+      - 2021-22 fosslinux <fosslinux@aussies.space>
+      - 2022 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  bison-3.4.2:
+    noextract: /external/distfiles/bison-3.4.2.tar.xz
+  gnulib-672663a:
+    noextract: /external/distfiles/gnulib-672663a.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/bison-3.4.2
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/flex:2.6.4
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/help2man:1.36.4
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/binutils:2.30
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/linux-headers:4.14.341-openela
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/make:3.82-pass1
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+build:
+  unpack_dirname: bison-3.4.2
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - rm src/parse-gram.c src/parse-gram.h
+  - rm src/scan-code.c
+  - rm src/scan-gram.c
+  - rm src/scan-skel.c
+  - rm doc/bison.info
+  - ../../import-gnulib.sh
+  - cmd: AUTOPOINT=true AUTOMAKE=automake-1.15 ACLOCAL=aclocal-1.15 autoreconf-2.69
+      -fi
+    bash: true
+  configure:
+  - ./configure --prefix="${PREFIX}" --libdir="${LIBDIR}" --disable-nls
+  compile:
+  - make -j1 MAKEINFO=true
+  install:
+  - make MAKEINFO=true DESTDIR="${DESTDIR}" install
+artefacts:
+- /external/repo/bison-3.4.2_0.tar.bz2

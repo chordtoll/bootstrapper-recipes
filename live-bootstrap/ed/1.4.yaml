@@ -1,0 +1,40 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 2023 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  ed-1.4:
+    noextract: /external/distfiles/ed-1.4.tar.xz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/ed-1.4
+mkdirs:
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- stage0-posix/final:unxz
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/tar:1.12
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/binutils:2.30
+- live-bootstrap/musl:1.2.4-pass1
+- live-bootstrap/gcc:4.0.4-pass2
+build:
+  unpack_dirname: ed-1.4
+  patch_dir: patches
+  prepare:
+  - rm doc/ed.info
+  configure:
+  - ./configure --prefix="${PREFIX}" --build=i386-unknown-linux-musl
+  install:
+  - install -m 755 -D ed ${DESTDIR}/usr/bin/ed
+artefacts:
+- external/repo/ed-1.4_0.tar.bz2

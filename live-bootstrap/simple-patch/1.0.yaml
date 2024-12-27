@@ -1,0 +1,21 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2023 fosslinux <fosslinux@aussies.space>
+source:
+  live-bootstrap:
+    extract: /live-bootstrap
+  M2libc:
+    extract: /M2libc
+deps:
+  - stage0-posix/final:all
+build:
+  single:
+    - pkg=simple-patch-1.0
+    - cd /live-bootstrap/steps/${pkg}
+    - M2-Mesoplanet --architecture ${ARCH} -f src/simple-patch.c -o ${bindir}/simple-patch
+    - sha256sum -o ${pkg}.checksums /usr/bin/simple-patch
+artefacts:
+  - /usr/bin/simple-patch

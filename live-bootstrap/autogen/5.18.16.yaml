@@ -1,0 +1,121 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 
+      - 2022 Andrius Štikonas <andrius@stikonas.eu>
+      - 2022 fosslinux <fosslinux@aussies.space>
+source:
+  autogen-5.18.16-v1.0.1:
+    noextract: /external/distfiles/autogen-5.18.16-v1.0.1.tar.gz
+  autogen-5.18.16-gz:
+    noextract: /external/distfiles/autogen-5.18.16.tar.gz
+  autogen-5.18.16-xz:
+    noextract: /external/distfiles/autogen-5.18.16.tar.xz
+  gnulib-8f4538a5:
+    noextract: /external/distfiles/gnulib-8f4538a5.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/autogen-5.18.16
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/util-linux:2.19.1
+- live-bootstrap/libtool:2.4.7
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/pkg-config:0.29.2
+- live-bootstrap/make:4.2.1
+- live-bootstrap/bison:3.4.2
+- live-bootstrap/flex:2.5.33
+- live-bootstrap/dist:3.5-236
+- live-bootstrap/perl:5.32.1
+- live-bootstrap/automake:1.16.3
+- live-bootstrap/autoconf:2.71
+- live-bootstrap/patch:2.7.6
+- live-bootstrap/gmp:6.2.1
+- live-bootstrap/gcc:4.7.4
+- live-bootstrap/binutils:2.41-pass1
+- live-bootstrap/libatomic_ops:7.6.10
+- live-bootstrap/gc:8.0.4
+- live-bootstrap/gperf:3.1
+- live-bootstrap/grep:3.7
+- live-bootstrap/libffi:3.3
+- live-bootstrap/libunistring:0.9.10
+- live-bootstrap/guile:3.0.9
+- live-bootstrap/sed:4.8
+- live-bootstrap/which:2.21
+build:
+  unpack_dirname: gnu-autogen-bootstrapping-autogen-5.18.16-v1.0.1
+  patch_dir: patches
+  unpack:
+  - noextract="autogen-5.18.16.tar.xz"
+  - default
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - cd /steps/autogen-5.18.16/build/gnu-autogen-bootstrapping-autogen-5.18.16-v1.0.1
+  - mkdir build
+  - mv ../autogen-5.18.16 build/src
+  - mv ../autogen-5.18.16.tar.xz build/
+  - rm -f build/src/add-on/char-mapper/cm.tar
+  compile:
+  - cd /steps/autogen-5.18.16/build/gnu-autogen-bootstrapping-autogen-5.18.16-v1.0.1
+  - PKG_CONFIG_PATH=/usr/lib/i386-unknown-linux-musl/pkgconfig
+  - sed -i "s/make install/make install DESTDIR=\${DESTDIR}/" bootstrap_tarball.sh
+  - sed -i "/make check/d" bootstrap_tarball.sh
+  - FINALPREFIX=/usr
+  - GUILE_STATIC=--static
+  - GNULIBDIR=/steps/autogen-5.18.16/build/gnu-autogen-bootstrapping-autogen-5.18.16-v1.0.1/../gnulib-8f4538a5
+  - MAN_PAGE_DATE=1970-01-01
+  - bash -xc 'SKIP_MAIN=1 . ./bootstrap_tarball.sh; prepare_tarball'
+  - bash -xc 'SKIP_MAIN=1 . ./bootstrap_tarball.sh; bootstrap_columns'
+  - bash -xc 'SKIP_MAIN=1 . ./bootstrap_tarball.sh; bootstrap_getdefs'
+  - PATH=/steps/autogen-5.18.16/build/gnu-autogen-bootstrapping-autogen-5.18.16-v1.0.1/build/stage1/bin:/usr/bin
+  - bash -xc 'SKIP_MAIN=1 . ./bootstrap_tarball.sh; bootstrap_autogen'
+  - bash -xc 'SKIP_MAIN=1 . ./bootstrap_tarball.sh; bootstrap_tpl_config'
+  - cd /steps/autogen-5.18.16/build/gnu-autogen-bootstrapping-autogen-5.18.16-v1.0.1
+  - rm -R build/tarball
+  - cp -ar build/autogen-5.18.16 build/tarball
+  - cd build/tarball
+  - sed -i "s/+%Y/+1970/; s/%m/01/; s/%d'/01'/; s/%Y/2018/" autoopts/aoconf.tpl
+  - sed -i 's/%Y/2018/' autoopts/options_h.tpl
+  - cmd: 
+      SOURCE_DIR=/steps/autogen-5.18.16/build/gnu-autogen-bootstrapping-autogen-5.18.16-v1.0.1/build/tarball
+      ./config/bootstrap
+    bash: true
+  - cmd: CPPFLAGS=-D_LARGEFILE64_SOURCE=1 ./configure --prefix="${FINALPREFIX}" --libdir="${FINALPREFIX}/lib/i386-unknown-linux-musl"
+      --disable-shared --enable-timeout=15
+    bash: true
+  - touch doc/agdoc.texi
+  - make -j1 CFLAGS=-Wno-error
+  - cmd: awk "{gsub(\"\\\\(/tmp/.*\", \"\", \$7); print}" agen5/autogen.1 > autogen.1
+    bash: true
+  - mv autogen.1 agen5/autogen.1
+  - cd ../..
+  install:
+  - cd build/tarball
+  - make DESTDIR="${DESTDIR}" install MAN_PAGE_DATE=1970-01-01
+  - cmd: rm "${DESTDIR}${PREFIX}/share/autogen/libopts-"*.tar.gz
+    bash: true
+  - cd ../..
+artefacts:
+- /external/repo/autogen-5.18.16_0.tar.bz2
+- /steps/autogen-5.18.16/build/

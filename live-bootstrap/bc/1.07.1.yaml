@@ -1,0 +1,53 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 2023 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  bc-1.07.1:
+    noextract: /external/distfiles/bc-1.07.1.tar.xz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/bc-1.07.1
+mkdirs:
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- stage0-posix/final:unxz
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/tar:1.12
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/flex:2.6.4
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/autoconf:2.52
+- live-bootstrap/automake:1.6.3-pass1
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/binutils:2.30
+- live-bootstrap/musl:1.2.4-pass1
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/ed:1.4
+build:
+  unpack_dirname: bc-1.07.1
+  patch_dir: patches
+  prepare:
+  - rm bc/bc.c bc/bc.h
+  - rm bc/scan.c
+  - sed -i 's/ doc//' Makefile.am
+  - cmd: AUTOMAKE=automake-1.15 ACLOCAL=aclocal-1.15 autoreconf-2.69 -fi
+    bash: true
+  configure:
+  - ./configure --prefix="${PREFIX}" --build=i386-unknown-linux-musl
+artefacts:
+- external/repo/bc-1.07.1_0.tar.bz2

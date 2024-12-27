@@ -1,0 +1,152 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2022 Dor Askayo <dor.askayo@gmail.com>
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+      - 2022 fosslinux <fosslinux@aussies.space>
+source:
+  libtool-2.4.7:
+    noextract: /external/distfiles/libtool-2.4.7.tar.xz
+  gnulib-a521820:
+    noextract: /external/distfiles/gnulib-a521820.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/libtool-2.4.7
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/mescc-tools-seed-kaem/hex0:latest
+- stage0-posix/mescc-tools-mini-kaem/hex1:latest
+- stage0-posix/mescc-tools-mini-kaem/hex2:0
+- stage0-posix/mescc-tools-mini-kaem/catm:latest
+- stage0-posix/mescc-tools-mini-kaem/m0:latest
+- stage0-posix/mescc-tools-mini-kaem/cc_x86:latest
+- stage0-posix/mescc-tools-mini-kaem/m2-planet:latest
+- stage0-posix/mescc-tools-mini-kaem/blood-elf:0
+- stage0-posix/mescc-tools-mini-kaem/m1:0
+- stage0-posix/mescc-tools-mini-kaem/hex2:1
+- stage0-posix/mescc-tools-mini-kaem/m1:latest
+- stage0-posix/mescc-tools-mini-kaem/hex2:latest
+- stage0-posix/mescc-tools-full-kaem/blood-elf:latest
+- stage0-posix/mescc-tools-full-kaem/m2-mesoplanet:latest
+- stage0-posix/mescc-tools-full-kaem/m2-planet:latest
+- stage0-posix/mescc-tools-extra/mescc-tools-extra:latest
+- stage0-posix/mescc-tools-full-kaem/get-machine:latest
+- stage0-posix/mescc-tools-mini-kaem/kaem:latest
+- stage0-posix/final:all
+- live-bootstrap/mes:0.26
+- live-bootstrap/simple-patch:1.0
+- live-bootstrap/tcc:0.9.26
+- live-bootstrap/tcc:0.9.27-pass0
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/tar:1.12
+- live-bootstrap/bzip2:1.0.8-pass0
+- live-bootstrap/sed:4.0.9-pass0
+- live-bootstrap/coreutils:5.0-pass0
+- stage0-posix/final:sha256sum
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/flex:2.5.11
+- live-bootstrap/tcc:0.9.27-pass1
+- live-bootstrap/musl:1.1.24-pass1
+- live-bootstrap/tcc:0.9.27-pass2
+- live-bootstrap/musl:1.1.24-pass2
+- live-bootstrap/tcc:0.9.27-pass3
+- live-bootstrap/sed:4.0.9-pass1
+- stage0-posix/final:unxz
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/flex:2.6.4
+- live-bootstrap/bison:3.4.1-pass1
+- live-bootstrap/bison:3.4.1-pass2
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/coreutils:5.0-pass1
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/autoconf:2.52
+- live-bootstrap/automake:1.6.3-pass1
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.000
+- live-bootstrap/perl:5.003
+- live-bootstrap/perl:5.004-05
+- live-bootstrap/perl:5.005-03
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/automake:1.6.3-pass2
+- live-bootstrap/autoconf:2.53
+- live-bootstrap/automake:1.7
+- live-bootstrap/autoconf:2.54
+- live-bootstrap/autoconf:2.55
+- live-bootstrap/automake:1.7.8
+- live-bootstrap/autoconf:2.57
+- live-bootstrap/autoconf:2.59
+- live-bootstrap/automake:1.8.5
+- live-bootstrap/help2man:1.36.4
+- live-bootstrap/autoconf:2.61
+- live-bootstrap/automake:1.9.6
+- live-bootstrap/automake:1.10.3
+- live-bootstrap/autoconf:2.64
+- live-bootstrap/automake:1.11.2
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/libtool:2.2.4
+- live-bootstrap/binutils:2.30
+- live-bootstrap/musl:1.1.24-pass3
+- live-bootstrap/tcc:0.9.27-pass4
+- live-bootstrap/gcc:4.0.4-pass1
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/musl:1.2.4-pass1
+- live-bootstrap/linux-headers:4.14.341-openela
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/make:3.82-pass1
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/ed:1.4
+- live-bootstrap/bc:1.07.1
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/util-linux:2.19.1
+build:
+  unpack_dirname: libtool-2.4.7
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - rm -f build-aux/ltmain.sh
+  - cmd: rm -f doc/*.info
+    bash: true
+  - rm -f bootstrap
+  - ../../import-gnulib.sh
+  - cmd: ../../import-gnulib.sh; LIBTOOLIZE=true AUTOPOINT=true ../../bootstrap-helper.sh
+    bash: true
+  - cmd: ../../import-gnulib.sh; LIBTOOLIZE=true AUTOPOINT=true AUTOMAKE=automake-1.15
+      ACLOCAL=aclocal-1.15 AUTOCONF=autoconf-2.69 AUTOHEADER=autoheader-2.69 autoreconf-2.69
+      -fi
+    bash: true
+  - cmd: ../../import-gnulib.sh; LIBTOOLIZE=true AUTOPOINT=true AUTOMAKE=automake-1.15
+      ACLOCAL=aclocal-1.15 AUTOCONF=autoconf-2.69 AUTOHEADER=autoheader-2.69 autoreconf-2.69
+      -fi libltdl
+    bash: true
+  configure:
+  - ./configure --prefix="${PREFIX}" --libdir="${LIBDIR}" --disable-shared --host=i386-unknown-linux
+    --target=i386-unknown-linux --build=i386-unknown-linux ac_path_EGREP="egrep" ac_path_FGREP="fgrep"
+    ac_path_GREP="grep" ac_path_SED="sed"
+  compile:
+  - make -j1 V=1 AUTOM4TE=autom4te-2.69 MAKEINFO=true
+  install:
+  - make install MAKEINFO=true DESTDIR="${DESTDIR}"
+  - sed -i -e "s/{EGREP=.*/{EGREP='egrep'}/" -e "s/{FGREP=.*/{FREGP='fgrep'}/" -e
+    "s/{GREP=.*/{GREP='grep'}/" -e "s/{SED=.*/{SED='sed'}/" "${DESTDIR}/usr/bin/libtool"
+      # TODO: Fix this one, help2man is having trouble
+  - mv /output-patch/libtool.1 ${DESTDIR}/usr/share/man/man1/
+  - mv /output-patch/libtoolize.1 ${DESTDIR}/usr/share/man/man1/
+artefacts:
+- /external/repo/libtool-2.4.7_0.tar.bz2

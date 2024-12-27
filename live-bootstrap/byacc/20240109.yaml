@@ -1,0 +1,48 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+      - 2021-22 fosslinux <fosslinux@aussies.space>
+      - 2024 Gábor Stefanik <netrolller.3d@gmail.com>
+source:
+  byacc-20240109:
+    noextract: /external/distfiles/byacc-20240109.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/byacc-20240109
+mkdirs:
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/mes:0.26
+- live-bootstrap/simple-patch:1.0
+- live-bootstrap/tcc:0.9.27-pass0
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/tar:1.12
+- live-bootstrap/bzip2:1.0.8-pass0
+- live-bootstrap/sed:4.0.9-pass0
+- live-bootstrap/coreutils:5.0-pass0
+build:
+  single:
+  - pkg="byacc-20240109"
+  - cd /steps/${pkg}
+  - mkdir build src
+  - cd build
+  - cp ${DISTFILES}/${pkg}.tar.gz ../src/
+  - gunzip -f ../src/${pkg}.tar.gz
+  - tar xf ../src/${pkg}.tar
+  - cd ${pkg}
+  - cp ../../files/Makefile .
+  - patch -Np0 -i ../../patches/meslibc.patch
+  - make CC=tcc AR="tcc -ar" CFLAGS="-DMAXPATHLEN=100 -DEILSEQ=84 -DMB_LEN_MAX=100"
+    LDFLAGS="-lgetopt -static" RANLIB=true
+  - install yacc ${BINDIR}/yacc
+  - cd ../..
+  - sha256sum -c ${pkg}.checksums
+artefacts:
+- usr/bin/yacc

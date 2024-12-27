@@ -1,0 +1,54 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 2021 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  automake-1.16.3:
+    noextract: /external/distfiles/automake-1.16.3.tar.xz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/automake-1.16.3
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/help2man:1.36.4
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/make:4.2.1
+- live-bootstrap/perl:5.32.1
+build:
+  unpack_dirname: automake-1.16.3
+  patch_dir: patches
+  prepare:
+  - cmd: AUTOMAKE=automake-1.15 ACLOCAL=aclocal-1.15 AUTOCONF=autoconf-2.69 AUTOM4TE=autom4te-2.69
+      ./bootstrap
+    bash: true
+  - cmd: rm doc/automake-history.info doc/automake.info*
+    bash: true
+  - cp "${PREFIX}/bin/help2man" doc/
+  configure:
+  - cmd: AUTOCONF=autoconf-2.69 ./configure --prefix="${PREFIX}"
+    bash: true
+  compile:
+  - make "${MAKEJOBS}" MAKEINFO=true
+  install:
+  - make install MAKEINFO=true DESTDIR="${DESTDIR}"
+artefacts:
+- /external/repo/automake-1.16.3_0.tar.bz2

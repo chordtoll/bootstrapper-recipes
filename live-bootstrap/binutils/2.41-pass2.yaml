@@ -1,0 +1,157 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 
+      - 2022 Dor Askayo <dor.askayo@gmail.com>
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+      - 2021 Paul Dersey <pdersey@gmail.com>
+      - 2023 fosslinux <fosslinux@aussies.space>
+source:
+  binutils-2.41:
+    noextract: /external/distfiles/binutils-2.41.tar.xz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/binutils-2.41
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/flex:2.6.4
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/libtool:2.4.7
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/make:4.2.1
+- live-bootstrap/bison:3.4.2
+- live-bootstrap/perl:5.32.1
+- live-bootstrap/patch:2.7.6
+- live-bootstrap/gettext:0.21
+- live-bootstrap/libarchive:3.5.2
+- live-bootstrap/texinfo:6.7
+- live-bootstrap/zlib:1.2.13
+- live-bootstrap/binutils:2.41-pass1
+- live-bootstrap/grep:3.7
+- live-bootstrap/libunistring:0.9.10
+- live-bootstrap/guile:3.0.9
+- live-bootstrap/sed:4.8
+- live-bootstrap/which:2.21
+- live-bootstrap/autogen:5.18.16
+- live-bootstrap/musl:1.2.4-pass3
+- live-bootstrap/gcc:10.4.0
+build:
+  unpack_dirname: binutils-2.41
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - rm etc/Makefile.in etc/configure
+  - rm zlib/aclocal.m4 zlib/configure
+  - autogen Makefile.def
+  - cmd: ACLOCAL=aclocal-1.15 autoreconf-2.69 -fi
+    bash: true
+  - cmd: cd bfd && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69 -fi
+    bash: true
+  - cmd: cd binutils && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69
+      -fi
+    bash: true
+  - cmd: cd gas && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69 -fi
+    bash: true
+  - cmd: cd gold && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69 -fi
+    bash: true
+  - cmd: cd gprof && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69 -fi
+    bash: true
+  - cmd: cd intl && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69 -fi
+    bash: true
+  - cmd: cd ld && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69 -fi
+    bash: true
+  - cmd: cd libctf && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69
+      -fi
+    bash: true
+  - cmd: cd libiberty && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69
+      -fi
+    bash: true
+  - cmd: cd libsframe && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69
+      -fi
+    bash: true
+  - cmd: cd opcodes && ACLOCAL=aclocal-1.15 AUTOMAKE=automake-1.15 autoreconf-2.69
+      -fi
+    bash: true
+  - cmd: cd gold; automake-1.15 -fai testsuite/Makefile
+    bash: true
+  - cd gprofng
+  - automake-1.15 -fai doc/Makefile
+  - automake-1.15 -fai gp-display-html/Makefile
+  - automake-1.15 -fai src/Makefile
+  - cd ..
+  - sed -i 's/@USE_INCLUDED_LIBINTL@/no/' intl/Makefile.in
+  - sed -i 's:\(--mode=link $(CCLD)\):\1 -all-static:' bfd/Makefile.in
+  - sed -i 's:\(--mode=link $(CCLD)\):\1 -all-static:' binutils/Makefile.in
+  - sed -i 's:\(--mode=link $(CCLD)\):\1 -all-static:' opcodes/Makefile.in
+  - sed -i 's:\(--mode=link $(CCLD)\):\1 -all-static:' ld/Makefile.in
+  - sed -i 's:\(--mode=link $(CCLD)\):\1 -all-static:' libctf/Makefile.in
+  - sed -i 's:\(--mode=link $(CCLD)\):\1 -all-static:' gas/Makefile.in
+  - sed -i 's:\(--mode=link $(CCLD)\):\1 -all-static:' gprof/Makefile.in
+  - cmd: touch -- */*.y
+    bash: true
+  - rm binutils/arparse.c binutils/arparse.h
+  - rm binutils/defparse.c binutils/defparse.h
+  - rm binutils/mcparse.c binutils/mcparse.h
+  - rm binutils/rcparse.c binutils/rcparse.h
+  - rm binutils/sysinfo.c binutils/sysinfo.h
+  - rm gas/config/bfin-parse.c gas/config/bfin-parse.h
+  - rm gas/config/loongarch-parse.c gas/config/loongarch-parse.h
+  - rm gas/config/m68k-parse.c gas/config/rl78-parse.c
+  - rm gas/config/rl78-parse.h gas/config/rx-parse.c
+  - rm gas/config/rx-parse.h gas/itbl-parse.c
+  - rm gas/itbl-parse.h gold/yyscript.c
+  - rm gold/yyscript.h intl/plural.c
+  - rm ld/deffilep.c ld/deffilep.h
+  - rm ld/ldgram.c ld/ldgram.h
+  - cmd: touch -- */*.l */*/*.l
+    bash: true
+  - rm binutils/arlex.c binutils/deflex.c binutils/syslex.c
+  - rm gas/config/bfin-lex.c gas/config/loongarch-lex.c gas/itbl-lex.c
+  - rm ld/ldlex.c
+  - find . -type f -name '*.info*' -not -wholename './binutils/sysroff.info' -delete
+  - rm opcodes/i386-init.h opcodes/i386-tbl.h opcodes/i386-mnem.h
+  - rm opcodes/ia64-asmtab.c
+  - rm opcodes/z8k-opc.h
+  - rm opcodes/aarch64-asm-2.c opcodes/aarch64-opc-2.c opcodes/aarch64-dis-2.c
+  - cmd: rm $(grep -l "MACHINE GENERATED" opcodes/*.c opcodes/*.h)
+    bash: true
+  - rm libiberty/functions.texi
+  - ./bfd/mep-relocs.pl
+  - find . -type f \( -name '*.1' -or -name '*.man' \) -delete
+  configure:
+  - mkdir build
+  - cd build
+  - cmd: LDFLAGS="-static" ../configure --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --build=i386-unknown-linux-musl --host=i386-unknown-linux-musl --target=i386-unknown-linux-musl
+      --enable-static --disable-nls --disable-multilib --disable-plugins --disable-gprofng
+      --enable-threads --enable-64-bit-bfd --enable-gold --enable-ld=default --enable-install-libiberty
+      --enable-deterministic-archives --with-system-zlib --program-prefix="" --with-sysroot=
+      --srcdir=..
+    bash: true
+  install:
+  - default
+  - cd "${DESTDIR}${PREFIX}/bin"
+  - cmd: for f in *; do ln -s "${PREFIX}/bin/${f}" "i386-unknown-linux-musl-${f}";
+      done
+    bash: true
+  - rm -r "${DESTDIR}${PREFIX}/share/man"
+artefacts:
+- /external/repo/binutils-2.41_1.tar.bz2

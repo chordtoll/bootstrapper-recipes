@@ -1,0 +1,61 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2021-22 fosslinux <fosslinux@aussies.space>
+      - 2022 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  perl-5.10.1:
+    noextract: /external/distfiles/perl-5.10.1.tar.bz2
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/perl-5.10.1
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/binutils:2.30
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/file:5.44
+- live-bootstrap/libtool:2.4.7
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/make:4.2.1
+- live-bootstrap/flex:2.5.33
+- live-bootstrap/bison:2.3
+build:
+  unpack_dirname: perl-5.10.1
+  patch_dir: patches
+  prepare:
+  - default
+  - perl regen_perly.pl -b bison-2.3
+  - rm -f perly.y
+  - rm -f lib/warnings.pm warnings.h regnodes.h reentr.h reentr.c overload.h overload.c
+    lib/overload/numbers.pm opcode.h opnames.h pp_proto.h pp.sym keywords.h embed.h
+    embedvar.h global.sym perlapi.c perlapi.h proto.h
+  - perl regen.pl
+  - mkdir -p ext/File ext/Digest ext/Data
+  - mv ext/File-Glob ext/File/Glob
+  - mv ext/Digest-SHA ext/Digest/SHA
+  - mv ext/Data-Dumper ext/Data/Dumper
+artefacts:
+- /external/repo/perl-5.10.1_0.tar.bz2

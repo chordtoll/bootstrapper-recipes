@@ -1,0 +1,59 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 2024 fosslinux <fosslinux@aussies.space>
+source:
+  libbsd-0.11.8:
+    noextract: /external/distfiles/libbsd-0.11.8.tar.xz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/libbsd-0.11.8
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/libtool:2.4.7
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/pkg-config:0.29.2
+- live-bootstrap/make:4.2.1
+- live-bootstrap/perl:5.32.1
+- live-bootstrap/automake:1.16.3
+- live-bootstrap/autoconf:2.71
+- live-bootstrap/patch:2.7.6
+- live-bootstrap/gettext:0.21
+- live-bootstrap/libarchive:3.5.2
+- live-bootstrap/texinfo:6.7
+- live-bootstrap/zlib:1.2.13
+- live-bootstrap/grep:3.7
+- live-bootstrap/sed:4.8
+- live-bootstrap/which:2.21
+- live-bootstrap/musl:1.2.4-pass3
+- live-bootstrap/binutils:2.41-pass2
+- live-bootstrap/gcc:13.1.0
+- live-bootstrap/libmd:1.1.0
+build:
+  unpack_dirname: libbsd-0.11.8
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - autoreconf-2.71 -fi
+  configure:
+  - ./configure --prefix="${PREFIX}" --libdir="${LIBDIR}"
+artefacts:
+- external/repo/libbsd-0.11.8_0.tar.bz2

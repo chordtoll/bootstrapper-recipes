@@ -1,0 +1,179 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 
+      - 2022 Andrius Štikonas <andrius@stikonas.eu>
+      - 2021 Michael Schierl <schierlm@gmx.de>
+      - 2022 fosslinux <fosslinux@aussies.space>
+source:
+  guile-3.0.9:
+    noextract: /external/distfiles/guile-3.0.9.tar.xz
+  guile-3.0.7:
+    noextract: /external/distfiles/guile-3.0.7.tar.xz
+  guile-psyntax-bootstrapping-3.0.7:
+    noextract: /external/distfiles/guile-3.0.7.tar.gz
+  gnulib-901694b9:
+    noextract: /external/distfiles/gnulib-901694b9.tar.gz
+  gnulib-356a414e:
+    noextract: /external/distfiles/gnulib-356a414e.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/guile-3.0.9
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/byacc:20240109
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/tcc:0.9.27-pass1
+- live-bootstrap/musl:1.1.24-pass1
+- live-bootstrap/tcc:0.9.27-pass2
+- live-bootstrap/musl:1.1.24-pass2
+- live-bootstrap/tcc:0.9.27-pass3
+- live-bootstrap/sed:4.0.9-pass1
+- stage0-posix/final:unxz
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/heirloom-devtools:070527
+- live-bootstrap/flex:2.5.11
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/flex:2.6.4
+- live-bootstrap/bison:3.4.1-pass1
+- live-bootstrap/bison:3.4.1-pass2
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/coreutils:5.0-pass1
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/autoconf:2.52
+- live-bootstrap/automake:1.6.3-pass1
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.000
+- live-bootstrap/perl:5.003
+- live-bootstrap/perl:5.004-05
+- live-bootstrap/perl:5.005-03
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/automake:1.6.3-pass2
+- live-bootstrap/autoconf:2.53
+- live-bootstrap/automake:1.7
+- live-bootstrap/autoconf:2.54
+- live-bootstrap/autoconf:2.55
+- live-bootstrap/automake:1.7.8
+- live-bootstrap/autoconf:2.57
+- live-bootstrap/autoconf:2.59
+- live-bootstrap/automake:1.8.5
+- live-bootstrap/help2man:1.36.4
+- live-bootstrap/autoconf:2.61
+- live-bootstrap/automake:1.9.6
+- live-bootstrap/automake:1.10.3
+- live-bootstrap/autoconf:2.64
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/libtool:2.2.4
+- live-bootstrap/binutils:2.30
+- live-bootstrap/musl:1.1.24-pass3
+- live-bootstrap/tcc:0.9.27-pass4
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/musl:1.2.4-pass1
+- live-bootstrap/linux-headers:4.14.341-openela
+- live-bootstrap/make:3.82-pass1
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/ed:1.4
+- live-bootstrap/bc:1.07.1
+- live-bootstrap/util-linux:2.19.1
+- live-bootstrap/libtool:2.4.7
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/pkg-config:0.29.2
+- live-bootstrap/make:4.2.1
+- live-bootstrap/bison:3.4.2
+- live-bootstrap/flex:2.5.33
+- live-bootstrap/bison:2.3
+- live-bootstrap/perl:5.10.1
+- live-bootstrap/dist:3.5-236
+- live-bootstrap/perl:5.32.1
+- live-bootstrap/automake:1.16.3
+- live-bootstrap/autoconf:2.71
+- live-bootstrap/autoconf-archive:2021.02.19
+- live-bootstrap/patch:2.7.6
+- live-bootstrap/gettext:0.21
+- live-bootstrap/gmp:6.2.1
+- live-bootstrap/mpfr:4.1.0
+- live-bootstrap/mpc:1.2.1
+- live-bootstrap/libarchive:3.5.2
+- live-bootstrap/texinfo:6.7
+- live-bootstrap/zlib:1.2.13
+- live-bootstrap/gcc:4.7.4
+- live-bootstrap/binutils:2.41-pass1
+- live-bootstrap/libatomic_ops:7.6.10
+- live-bootstrap/gc:8.0.4
+- live-bootstrap/gperf:3.1
+- live-bootstrap/libffi:3.3
+- live-bootstrap/libunistring:0.9.10
+build:
+  unpack_dirname: guile-3.0.9
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - cd ../guile-3.0.7
+  - ../../import-gnulib-3.0.7.sh
+  - find . -name '*.info*' -delete
+  - cmd: rm -r prebuilt/*/ice-9
+    bash: true
+  - sed -i "s/`date -u +'%Y-%m-%d %T'.*`/1970-01-01 00:00:00/" libguile/Makefile.am
+  - autoreconf-2.71 -fi
+  - cmd: sha256sum module/ice-9/psyntax-pp.scm | tee psyntax-pp.sha256
+    bash: true
+  - rm module/ice-9/psyntax-pp.scm
+  - cmd: echo \(primitive-load-path \"psyntax-bootstrap/allsteps\"\) > module/ice-9/psyntax-pp.scm
+    bash: true
+  - mkdir -p module/psyntax-bootstrap
+  - cmd: cp ../guile-psyntax-bootstrapping-guile-3.0.7/psyntax-bootstrap/*.scm module/psyntax-bootstrap
+    bash: true
+  - cd module/ice-9
+  - cp psyntax.scm psyntax-patched.scm
+  - cmd: patch <../../../guile-psyntax-bootstrapping-guile-3.0.7/stage2.patch
+    bash: true
+  - cd ../..
+  - cd ../guile-3.0.9
+  - default
+  - ../../import-gnulib.sh
+  - find . -name '*.info*' -delete
+  - cmd: rm -r prebuilt/*/ice-9
+    bash: true
+  - sed -i "s/`date -u +'%Y-%m-%d %T'.*`/1970-01-01 00:00:00/" libguile/Makefile.am
+  - autoreconf-2.71 -fi
+  configure:
+  - cmd: PKG_CONFIG_PATH="${LIBDIR}/pkgconfig" ./configure --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --build=i386-unknown-linux-musl --disable-shared --disable-jit
+    bash: true
+  - cmd: cd ../guile-3.0.7; PKG_CONFIG_PATH="${LIBDIR}/pkgconfig" ./configure --prefix="${PREFIX}"
+      --libdir="${LIBDIR}" --build=i386-unknown-linux-musl --disable-shared --disable-jit
+    bash: true
+  compile:
+  - cd ../guile-3.0.7
+  - make config.h
+  - make libguile/scmconfig.h
+  - make .version
+  - cd lib
+  - make all
+  - cd ../meta
+  - make all
+  - cd ../libguile
+  - make all
+  - cd ../module
+  - make ice-9/psyntax-pp.scm.gen
+  - cd ../../guile-3.0.9
+  - cp -f ../guile-3.0.7/module/ice-9/psyntax-pp.scm module/ice-9/
+  - default
+artefacts:
+- /external/repo/guile-3.0.9_0.tar.bz2
