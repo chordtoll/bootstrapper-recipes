@@ -6,7 +6,7 @@ licenses:
       - 2021-22 fosslinux <fosslinux@aussies.space>
 source:
   openssl-3.0.13:
-    noextract: /external/distfiles/openssl-3.0.13.tar.gz
+    noextract: /external/distfiles/openssl_3.0.13.orig.tar.gz
   live-bootstrap:
     extract: /
     copy:
