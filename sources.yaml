@@ -272,8 +272,8 @@ linux-4.14.336:
   url: https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.14.336.tar.gz
   sha: 31d7cf54ba080875c451fff02ca17c0fdb4174a45719f01bf2b009fa705b9b9b
 live-bootstrap:
-  url: https://github.com/chordtoll/live-bootstrap/archive/e6ed60cec4d5a7771828d03654c560210e668367.zip
-  sha: 751dea9c5347257fed9570939136e130bf75de353813fc1078db21b512709839
+  url: https://github.com/chordtoll/live-bootstrap/archive/185bd78ec45e94ec4dfda6d3b47bba6997f50a93.zip
+  sha: f3a3082cc48b8c65617824d82adf31a25c7294fee15c403db06c0dc33da1b9da
 M2libc:
   url: https://github.com/oriansj/M2libc/archive/ddbb23567190e1e787305a545b81996be82b9cf9.zip
   sha: b2feb89d064cdb609a70295eeaa0c8eb1c3a9a0544cfce8c13055705ce464730
@@ -295,9 +295,9 @@ make-3.82:
 make-4.2.1:
   url: http://ftp.gnu.org/gnu/make/make-4.2.1.tar.gz
   sha: e40b8f018c1da64edd1cc9a6fce5fa63b2e707e404e20cad91fbae337c98a5b7
-mes-0.26.1:
-  url: https://mirrors.kernel.org/gnu/mes/mes-0.26.1.tar.gz
-  sha: e1370d528cbfcbb477ca35e59ae2f6fb71f611f9c856330e6dcb5f2459c2fcf4
+mes-0.27:
+  url: https://mirrors.kernel.org/gnu/mes/mes-0.27.tar.gz
+  sha: 033ee656d98cfc04a826eab27eed6e6a276d15bbb980a7cd71d00f30227aaaa8
 mescc-tools:
   url: https://github.com/oriansj/mescc-tools/archive/08d5a0679fa4dc00babe02306f1bc50703083389.zip
   sha: ad0db50e9725713e83a9c7f3e7825858e413f8bab44bebcf96a1b08904226155
@@ -396,7 +396,7 @@ shadow-4.14.3:
   sha: 6969279236fe3152768573a38c9f83cb9ca109851a5a990aec1fc672ac2cfcd2
 stage0-posix:
   url: https://github.com/oriansj/stage0-posix/archive/a779ee607a7921876388e6174419fc86d60e53c4.zip
-  sha: aaaa
+  sha: 8988b4cd5a25b2f42f6fa9943c3e7a2a19d54defc0c80798c6100c2d680e859a
 stage0-posix-x86:
   url: https://github.com/oriansj/stage0-posix-x86/archive/83508012c952e3aa3f70a89fd7d85d9a1af6f305.zip
   sha: e20dfd39d331026dacf6754dee21dbf7b4b6d3ec41066efeff541516750442a8

@@ -6,8 +6,8 @@ licenses:
       - 2020-2023 Andrius Štikonas <andrius@stikonas.eu>
       - 2020-2022 fosslinux <fosslinux@aussies.space>
 source:
-  mes-0.26.1:
-    noextract: /external/distfiles/mes-0.26.1.tar.gz
+  mes-0.27:
+    noextract: /external/distfiles/mes-0.27.tar.gz
   nyacc-1.00.2:
     noextract: /external/distfiles/nyacc-1.00.2.tar.gz
   live-bootstrap:
@@ -21,20 +21,20 @@ deps:
   - stage0-posix/final:all
 build:
   single:
-    - pkg=mes-0.26.1
+    - pkg=mes-0.27
     - cd /steps/${pkg}
     - MES_ARENA=20000000
     - MES_MAX_ARENA=20000000
     - MES_STACK=6000000
     - MES=${bindir}/mes-m2
-    - MES_PREFIX=/steps/mes-0.26.1/build/mes-0.26.1
+    - MES_PREFIX=/steps/mes-0.27/build/mes-0.27
     - LIBDIR=${MES_PREFIX}/lib
     - MES_ARCH=x86
     - ARCH_BITS=32
     - MES_VERSION=
     - NYACC_PKG=nyacc-1.00.2
-    - MES_PKG=mes-0.26.1
-    - GUILE_LOAD_PATH=/steps/mes-0.26.1/build/mes-0.26.1/mes/module:/steps/mes-0.26.1/build/mes-0.26.1/module:/steps/mes-0.26.1/build/nyacc-1.00.2/module
+    - MES_PKG=mes-0.27
+    - GUILE_LOAD_PATH=/steps/mes-0.27/build/mes-0.27/mes/module:/steps/mes-0.27/build/mes-0.27/module:/steps/mes-0.27/build/nyacc-1.00.2/module
     - mkdir build
     - cd build
     - ungz --file ${DISTFILES}/${NYACC_PKG}.tar.gz --output ${NYACC_PKG}.tar
@@ -523,4 +523,4 @@ artefacts:
   - usr/include/mes/
   - usr/lib/linux/x86-mes/
   - usr/lib/x86-mes/
-  - steps/mes-0.26.1/build
+  - steps/mes-0.27/build

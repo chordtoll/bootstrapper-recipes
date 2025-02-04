@@ -6,8 +6,8 @@ licenses:
       - 2021-22 fosslinux <fosslinux@aussies.space>
       - 2021 Andrius Štikonas <andrius@stikonas.eu>
 source:
-  mes-0.26.1:
-    noextract: /external/distfiles/mes-0.26.1.tar.gz
+  mes-0.27:
+    noextract: /external/distfiles/mes-0.27.tar.gz
   tcc-0.9.27:
     noextract: /external/distfiles/tcc-0.9.27.tar.bz2
   live-bootstrap:
@@ -19,14 +19,14 @@ mkdirs:
 deps:
 - stage0-posix/final:all
 - live-bootstrap/simple-patch:1.0
-- live-bootstrap/mes:0.26.1
+- live-bootstrap/mes:0.27
 - live-bootstrap/tcc:0.9.26
 build:
   single:
   - MES_STACK=15000000
   - MES_ARENA=30000000
   - MES_MAX_ARENA=30000000
-  - MES_PREFIX=/steps/mes-0.26.1/build/mes-0.26.1
+  - MES_PREFIX=/steps/mes-0.27/build/mes-0.27
   - MES_LIB=${MES_PREFIX}/lib
   - MES_SOURCE=${MES_PREFIX}
   - MES=${BINDIR}/mes
@@ -35,7 +35,7 @@ build:
   - MES_ARCH=x86
   - TCC_TARGET_ARCH=I386
   - HAVE_LONG_LONG=0
-  - MES_PKG=mes-0.26.1
+  - MES_PKG=mes-0.27
   - pkg=tcc-0.9.27
   - cd /steps/${pkg}
   - mkdir build

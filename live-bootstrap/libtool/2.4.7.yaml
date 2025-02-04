@@ -40,7 +40,7 @@ deps:
 - stage0-posix/mescc-tools-full-kaem/get-machine:latest
 - stage0-posix/mescc-tools-mini-kaem/kaem:latest
 - stage0-posix/final:all
-- live-bootstrap/mes:0.26.1
+- live-bootstrap/mes:0.27
 - live-bootstrap/simple-patch:1.0
 - live-bootstrap/tcc:0.9.26
 - live-bootstrap/tcc:0.9.27-pass0

@@ -17,7 +17,7 @@ mkdirs:
 - /external/repo
 deps:
 - stage0-posix/final:sha256sum
-- live-bootstrap/mes:0.26.1
+- live-bootstrap/mes:0.27
 - live-bootstrap/make:3.82-pass0
 - live-bootstrap/patch:2.5.9
 - live-bootstrap/tar:1.12

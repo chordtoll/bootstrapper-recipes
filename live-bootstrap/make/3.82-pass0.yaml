@@ -15,7 +15,7 @@ mkdirs: []
 deps:
 - stage0-posix/final:all
 - live-bootstrap/simple-patch:1.0
-- live-bootstrap/mes:0.26.1
+- live-bootstrap/mes:0.27
 - live-bootstrap/tcc:0.9.27-pass0
 build:
   single:
