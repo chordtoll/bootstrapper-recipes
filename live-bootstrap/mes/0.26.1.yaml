@@ -6,8 +6,8 @@ licenses:
       - 2020-2023 Andrius Štikonas <andrius@stikonas.eu>
       - 2020-2022 fosslinux <fosslinux@aussies.space>
 source:
-  mes-0.26:
-    noextract: /external/distfiles/mes-0.26.tar.gz
+  mes-0.26.1:
+    noextract: /external/distfiles/mes-0.26.1.tar.gz
   nyacc-1.00.2:
     noextract: /external/distfiles/nyacc-1.00.2.tar.gz
   live-bootstrap:
@@ -21,20 +21,20 @@ deps:
   - stage0-posix/final:all
 build:
   single:
-    - pkg=mes-0.26
+    - pkg=mes-0.26.1
     - cd /steps/${pkg}
     - MES_ARENA=20000000
     - MES_MAX_ARENA=20000000
     - MES_STACK=6000000
     - MES=${bindir}/mes-m2
-    - MES_PREFIX=/steps/mes-0.26/build/mes-0.26
+    - MES_PREFIX=/steps/mes-0.26.1/build/mes-0.26.1
     - LIBDIR=${MES_PREFIX}/lib
     - MES_ARCH=x86
     - ARCH_BITS=32
     - MES_VERSION=
     - NYACC_PKG=nyacc-1.00.2
-    - MES_PKG=mes-0.26
-    - GUILE_LOAD_PATH=/steps/mes-0.26/build/mes-0.26/mes/module:/steps/mes-0.26/build/mes-0.26/module:/steps/mes-0.26/build/nyacc-1.00.2/module
+    - MES_PKG=mes-0.26.1
+    - GUILE_LOAD_PATH=/steps/mes-0.26.1/build/mes-0.26.1/mes/module:/steps/mes-0.26.1/build/mes-0.26.1/module:/steps/mes-0.26.1/build/nyacc-1.00.2/module
     - mkdir build
     - cd build
     - ungz --file ${DISTFILES}/${NYACC_PKG}.tar.gz --output ${NYACC_PKG}.tar
@@ -47,8 +47,9 @@ build:
     - cp ../files/config.h ${MES_PREFIX}/include/mes
     - cd ${MES_PREFIX}
     - mkdir include/arch
-    - cp include/linux/${MES_ARCH}/syscall.h include/arch/syscall.h
     - cp include/linux/${MES_ARCH}/kernel-stat.h include/arch/kernel-stat.h
+    - cp include/linux/${MES_ARCH}/signal.h include/arch/signal.h
+    - cp include/linux/${MES_ARCH}/syscall.h include/arch/syscall.h
     - rm mes/module/mes/psyntax.pp mes/module/mes/psyntax.pp.header
     - cp mes/module/srfi/srfi-9-struct.mes mes/module/srfi/srfi-9.mes
     - cp mes/module/srfi/srfi-9/gnu-struct.mes mes/module/srfi/srfi-9/gnu.mes
@@ -60,7 +61,6 @@ build:
     - replace --file ${mescc_in} --output ${mescc_in} --match-on @VERSION@ --replace-with "${MES_VERSION}"
     - replace --file ${mescc_in} --output ${mescc_in} --match-on @mes_cpu@ --replace-with ${MES_ARCH}
     - replace --file ${mescc_in} --output ${mescc_in} --match-on @mes_kernel@ --replace-with linux
-    - replace --file ${mescc_in} --output ${mescc_in} --match-on "(mescc:main (command-line))" --replace-with ");"
     - mescc_scm=${BINDIR}/mescc.scm
     - cp ${mescc_in} ${mescc_scm}
     - chmod 755 ${mescc_scm}
@@ -473,6 +473,7 @@ build:
     - cp include/setjmp.h ${INCDIR}/setjmp.h
     - cp include/signal.h ${INCDIR}/signal.h
     - cp include/stdarg.h ${INCDIR}/stdarg.h
+    - cp include/linux/${MES_ARCH}/signal.h ${INCDIR}/arch/signal.h
     - cp include/stdbool.h ${INCDIR}/stdbool.h
     - cp include/stddef.h ${INCDIR}/stddef.h
     - cp include/stdint.h ${INCDIR}/stdint.h
@@ -522,4 +523,4 @@ artefacts:
   - usr/include/mes/
   - usr/lib/linux/x86-mes/
   - usr/lib/x86-mes/
-  - steps/mes-0.26/build
+  - steps/mes-0.26.1/build

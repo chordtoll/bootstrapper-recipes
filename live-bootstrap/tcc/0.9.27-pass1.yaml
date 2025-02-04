@@ -6,8 +6,8 @@ licenses:
       - 2021-2022 Andrius Štikonas <andrius@stikonas.eu>
       - 2022-23 fosslinux <fosslinux@aussies.space>
 source:
-  mes-0.26:
-    noextract: /external/distfiles/mes-0.26.tar.gz
+  mes-0.26.1:
+    noextract: /external/distfiles/mes-0.26.1.tar.gz
   tcc-0.9.27:
     noextract: /external/distfiles/tcc-0.9.27.tar.bz2
   live-bootstrap:
@@ -21,7 +21,7 @@ mkdirs:
 - /tmp
 deps:
 - stage0-posix/final:sha256sum
-- live-bootstrap/mes:0.26
+- live-bootstrap/mes:0.26.1
 - live-bootstrap/tcc:0.9.26
 - live-bootstrap/tcc:0.9.27-pass0
 - live-bootstrap/make:3.82-pass0

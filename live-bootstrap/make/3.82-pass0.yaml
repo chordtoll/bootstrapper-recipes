@@ -15,7 +15,7 @@ mkdirs: []
 deps:
 - stage0-posix/final:all
 - live-bootstrap/simple-patch:1.0
-- live-bootstrap/mes:0.26
+- live-bootstrap/mes:0.26.1
 - live-bootstrap/tcc:0.9.27-pass0
 build:
   single:
@@ -28,7 +28,6 @@ build:
   - rm ${pkg}.tar
   - cd ${pkg}
   - catm config.h
-  - cp ../../files/putenv_stub.c putenv_stub.c
   - tcc -c getopt.c
   - tcc -c getopt1.c
   - tcc -c -I. -Iglob -DHAVE_INTTYPES_H -DHAVE_SA_RESTART -DHAVE_STDINT_H ar.c
@@ -61,11 +60,10 @@ build:
   - tcc -c -DHAVE_FCNTL_H getloadavg.c
   - tcc -c -Iglob -DSTDC_HEADERS glob/fnmatch.c
   - tcc -c -Iglob -DHAVE_STRDUP -DHAVE_DIRENT_H glob/glob.c
-  - tcc -c putenv_stub.c
   - tcc -static -o ${BINDIR}/make getopt.o getopt1.o ar.o arscan.o commands.o default.o
     dir.o expand.o file.o function.o implicit.o job.o main.o misc.o read.o remake.o
     rule.o signame.o strcache.o variable.o version.o vpath.o hash.o remote-stub.o
-    getloadavg.o fnmatch.o glob.o putenv_stub.o
+    getloadavg.o fnmatch.o glob.o
   - make --version
   - cd ../..
   - sha256sum -c ${pkg}.checksums

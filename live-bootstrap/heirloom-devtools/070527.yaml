@@ -19,7 +19,7 @@ mkdirs:
 - /tmp
 deps:
 - stage0-posix/final:sha256sum
-- live-bootstrap/mes:0.26
+- live-bootstrap/mes:0.26.1
 - live-bootstrap/tcc:0.9.27-pass0
 - live-bootstrap/make:3.82-pass0
 - live-bootstrap/patch:2.5.9

@@ -20,7 +20,7 @@ mkdirs:
 deps:
 - stage0-posix/final:sha256sum
 - stage0-posix/final:unxz
-- live-bootstrap/mes:0.26
+- live-bootstrap/mes:0.26.1
 - live-bootstrap/make:3.82-pass0
 - live-bootstrap/patch:2.5.9
 - live-bootstrap/tar:1.12

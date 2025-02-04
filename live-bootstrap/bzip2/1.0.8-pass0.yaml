@@ -14,7 +14,7 @@ source:
     - /steps/bzip2-1.0.8
 deps:
 - stage0-posix/final:all
-- live-bootstrap/mes:0.26
+- live-bootstrap/mes:0.26.1
 - live-bootstrap/tcc:0.9.27-pass0
 - live-bootstrap/make:3.82-pass0
 - live-bootstrap/patch:2.5.9
