@@ -1,0 +1,63 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2022 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  texinfo-6.7:
+    noextract: /external/distfiles/texinfo-6.7.tar.xz
+  gnulib-b81ec69:
+    noextract: /external/distfiles/gnulib-b81ec69.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/texinfo-6.7
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/binutils:2.30
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/make:4.2.1
+- live-bootstrap/bison:3.4.2
+- live-bootstrap/flex:2.5.33
+- live-bootstrap/perl:5.32.1
+- live-bootstrap/automake:1.16.3
+- live-bootstrap/autoconf:2.71
+- live-bootstrap/patch:2.7.6
+- live-bootstrap/gettext:0.21
+    #- live-bootstrap/libarchive:3.5.2
+    #- live-bootstrap/zlib:1.2.13
+build:
+  unpack_dirname: texinfo-6.7
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - find . -name '*.mo' -delete
+  - find . -name '*.gmo' -delete
+  - ../../import-gnulib.sh
+  - autoreconf -fi
+  configure:
+  - ./configure --prefix="${PREFIX}"
+artefacts:
+- /external/repo/texinfo-6.7_0.tar.bz2

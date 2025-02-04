@@ -1,0 +1,216 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+      - 2021 Paul Dersey <pdersey@gmail.com>
+      - 2021-23 fosslinux <fosslinux@aussies.space>
+source:
+  gcc-4.7.4:
+    noextract: /external/distfiles/gcc-4.7.4.tar.bz2
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/gcc-4.7.4
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/heirloom-devtools:070527
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/flex:2.6.4
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/autoconf:2.64
+- live-bootstrap/automake:1.11.2
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/libtool:2.2.4
+- live-bootstrap/binutils:2.30
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/linux-headers:4.14.341-openela
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/make:3.82-pass1
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/ed:1.4
+- live-bootstrap/bc:1.07.1
+- live-bootstrap/util-linux:2.19.1
+- live-bootstrap/libtool:2.4.7
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/pkg-config:0.29.2
+- live-bootstrap/make:4.2.1
+- live-bootstrap/bison:3.4.2
+- live-bootstrap/bison:2.3
+- live-bootstrap/perl:5.10.1
+- live-bootstrap/dist:3.5-236
+- live-bootstrap/perl:5.32.1
+- live-bootstrap/autoconf-archive:2021.02.19
+- live-bootstrap/patch:2.7.6
+- live-bootstrap/gettext:0.21
+- live-bootstrap/gmp:6.2.1
+- live-bootstrap/mpfr:4.1.0
+- live-bootstrap/mpc:1.2.1
+- live-bootstrap/libarchive:3.5.2
+- live-bootstrap/texinfo:6.7
+- live-bootstrap/zlib:1.2.13
+build:
+  unpack_dirname: gcc-4.7.4
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - rm gcc/cp/cfns.h
+  - rm configure Makefile.in fixincludes/fixincl.x
+  - rm libgo/aclocal.m4 libgo/configure libgo/Makefile.in
+  - cmd: cd intl; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64 aclocal-1.11
+      --acdir=../config
+    bash: true
+  - cmd: cd libcpp; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64 aclocal-1.11
+      --acdir=../config
+    bash: true
+  - cmd: cd libdecnumber; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      aclocal-1.11 --acdir=../config
+    bash: true
+  - cmd: cd gcc; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64 aclocal-1.11
+      --acdir=../config
+    bash: true
+  - cmd: cd fixincludes; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      aclocal-1.11 --acdir=../gcc
+    bash: true
+  - cmd: cd boehm-gc; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      aclocal-1.11
+    bash: true
+  - cmd: cd libffi; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64 aclocal-1.11
+    bash: true
+  - cmd: cd libgfortran; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      aclocal-1.11
+    bash: true
+  - cmd: cd libgomp; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      aclocal-1.11
+    bash: true
+  - cmd: cd libitm; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64 aclocal-1.11
+    bash: true
+  - cmd: cd libjava; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      aclocal-1.11
+    bash: true
+  - cmd: cd libmudflap; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      aclocal-1.11
+    bash: true
+  - cmd: cd libobjc; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      aclocal-1.11
+    bash: true
+  - cmd: cd libquadmath; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      aclocal-1.11
+    bash: true
+  - cmd: cd libssp; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64 aclocal-1.11
+    bash: true
+  - cmd: cd lto-plugin; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      aclocal-1.11
+    bash: true
+  - cmd: cd zlib; rm aclocal.m4; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64 aclocal-1.11
+    bash: true
+  - cmd: cd libstdc++-v3; ACLOCAL=aclocal-1.11 AUTOMAKE=automake-1.11 AUTOCONF=autoconf-2.64
+      AUTOM4TE=autom4te-2.64 autoreconf-2.64 -fi
+    bash: true
+  - cmd: for dir in $(find . -mindepth 2 -maxdepth 2 -name configure.ac | sed 's#/configure.ac##'
+      | grep -v -x './libgo' | tr '\n' ' ' | sed -e 's/ $/\n/' -e 's/^boehm-gc //');
+      do pushd "$dir"; rm configure; autoconf-2.64 || autoconf-2.64; popd; done
+    bash: true
+  - cmd: for dir in $(find . -mindepth 2 -maxdepth 2 -name Makefile.am | sed 's#/Makefile.am##'
+      | grep -v -x './libgo' | tr '\n' ' ' | sed -e 's/ $/\n/' -e 's/^boehm-gc //');
+      do pushd "$dir"; rm Makefile.in; AUTOCONF=autoconf-2.64 AUTOM4TE=autom4te-2.64
+      automake-1.11 --add-missing; popd; done
+    bash: true
+  - cmd: cd libdecnumber; rm -f config.in; autoheader-2.64
+    bash: true
+  - cmd: cd libcpp; rm -f config.in; autoheader-2.64
+    bash: true
+  - cmd: cd libiberty; rm -f config.in; autoheader-2.64
+    bash: true
+  - cmd: cd gcc; rm -f config.in; autoheader-2.64
+    bash: true
+  - rm config.guess config.sub ltmain.sh
+  - libtoolize
+  - cp "${PREFIX}/share/automake-1.15/config.sub" .
+  - rm intl/plural.c
+  - rm gcc/gengtype-lex.c
+  - cmd: cd libiberty; sed -n -e '39,66p' crc32.c > crcgen.c; gcc -o crcgen crcgen.c;
+      head -n 70 crc32.c > crc32.c.new; ./crcgen >> crc32.c.new; tail -n +139 crc32.c
+      >> crc32.c.new; mv crc32.c.new crc32.c
+    bash: true
+  - find . -name '*.gmo' -delete
+  - find . -name '*.info' -delete
+  configure:
+  - mkdir build
+  - cd build
+  - cmd: mkdir libiberty; cd libiberty; ../../libiberty/configure --prefix="${PREFIX}"
+      --libdir="${LIBDIR}" --build=i386-unknown-linux-musl --target=i386-unknown-linux-musl
+      --host=i386-unknown-linux-musl --disable-shared --program-transform-name= --enable-languages=c,c++
+      --disable-sjlj-exceptions --with-system-zlib
+    bash: true
+  - cmd: mkdir libcpp; cd libcpp; ../../libcpp/configure --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --build=i386-unknown-linux-musl --target=i386-unknown-linux-musl --host=i386-unknown-linux-musl
+      --disable-shared --program-transform-name= --enable-languages=c,c++ --disable-sjlj-exceptions
+      --with-system-zlib
+    bash: true
+  - cmd: mkdir libdecnumber; cd libdecnumber; ../../libdecnumber/configure --prefix="${PREFIX}"
+      --libdir="${LIBDIR}" --build=i386-unknown-linux-musl --target=i386-unknown-linux-musl
+      --host=i386-unknown-linux-musl --disable-shared --program-transform-name= --enable-languages=c,c++
+      --disable-sjlj-exceptions --with-system-zlib
+    bash: true
+  - cmd: mkdir gcc; cd gcc; ../../gcc/configure --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --build=i386-unknown-linux-musl --target=i386-unknown-linux-musl --host=i386-unknown-linux-musl
+      --disable-shared --program-transform-name= --enable-languages=c,c++ --disable-sjlj-exceptions
+      --with-system-zlib
+    bash: true
+  - cmd: mkdir libgcc; cd libgcc; ../../libgcc/configure --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --build=i386-unknown-linux-musl --target=i386-unknown-linux-musl --host=i386-unknown-linux-musl
+      --disable-shared --program-transform-name= --enable-languages=c,c++ --disable-sjlj-exceptions
+      --with-system-zlib
+    bash: true
+  - cmd: mkdir libstdc++-v3; cd libstdc++-v3; ../../libstdc++-v3/configure --prefix="${PREFIX}"
+      --libdir="${LIBDIR}" --build=i386-unknown-linux-musl --target=i386-unknown-linux-musl
+      --host=i386-unknown-linux-musl --disable-shared --program-transform-name= --enable-languages=c,c++
+      --disable-sjlj-exceptions --with-system-zlib
+    bash: true
+  - cd ..
+  compile:
+  - ln -s . build/build-i386-unknown-linux-musl
+  - make "${MAKEJOBS}" -C build/libiberty LIBGCC2_INCLUDES=-I"${PREFIX}/include" STMP_FIXINC=
+    GMPLIBS="-lmpc -lmpfr -lgmp" MAKEINFO=true
+  - make "${MAKEJOBS}" -C build/libcpp LIBGCC2_INCLUDES=-I"${PREFIX}/include" STMP_FIXINC=
+    GMPLIBS="-lmpc -lmpfr -lgmp" MAKEINFO=true
+  - make "${MAKEJOBS}" -C build/libdecnumber LIBGCC2_INCLUDES=-I"${PREFIX}/include"
+    STMP_FIXINC= GMPLIBS="-lmpc -lmpfr -lgmp" MAKEINFO=true
+  - make "${MAKEJOBS}" -C build/gcc LIBGCC2_INCLUDES=-I"${PREFIX}/include" STMP_FIXINC=
+    GMPLIBS="-lmpc -lmpfr -lgmp" MAKEINFO=true
+  - make "${MAKEJOBS}" -C build/libgcc PATH="${PATH}:../gcc" CC=../gcc/xgcc host_subdir=build
+    CFLAGS="-I../gcc/include -I/${PREFIX}/include"
+  - make "${MAKEJOBS}" -C build/libstdc++-v3 PATH="${PATH}:/steps/gcc-4.7.4/build/gcc-4.7.4/build/gcc"
+    CXXFLAGS="-I/steps/gcc-4.7.4/build/gcc-4.7.4/build/gcc/include -I ${PREFIX}/include"
+  install:
+  - make -C build/gcc install STMP_FIXINC= DESTDIR="${DESTDIR}" MAKEINFO=true
+  - make -C build/libgcc install DESTDIR="${DESTDIR}" host_subdir=build
+  - make -C build/libstdc++-v3 install DESTDIR="${DESTDIR}"
+  - ln -s gcc "${DESTDIR}${PREFIX}/bin/cc"
+  - cp gcc/gsyslimits.h "${DESTDIR}${LIBDIR}/gcc/i386-unknown-linux-musl/4.7.4/include/syslimits.h"
+  - mkdir -p "${DESTDIR}${LIBDIR}/gcc/i386-unknown-linux-musl/4.7.4/include/"
+  - cmd: mv "${DESTDIR}${LIBDIR}/gcc/i386-unknown-linux-musl/4.0.4/include/"* "${DESTDIR}${LIBDIR}/gcc/i386-unknown-linux-musl/4.7.4/include/"
+    bash: true
+  - rmdir "${DESTDIR}${LIBDIR}/gcc/i386-unknown-linux-musl/4.0.4/include"
+  - cmd: mv "${DESTDIR}${LIBDIR}/gcc/i386-unknown-linux-musl/4.0.4/"* "${DESTDIR}${LIBDIR}/gcc/i386-unknown-linux-musl/4.7.4/"
+    bash: true
+artefacts:
+- external/repo/gcc-4.7.4_0.tar.bz2

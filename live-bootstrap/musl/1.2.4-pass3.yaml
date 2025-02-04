@@ -1,0 +1,62 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2022 Dor Askayo <dor.askayo@gmail.com>
+      - 2022 Andrius Štikonas <andrius@stikonas.eu>
+      - 2023 fosslinux <fosslinux@aussies.space>
+source:
+  musl-1.2.4:
+    noextract: /external/distfiles/musl-1.2.4.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/musl-1.2.4
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/make:4.2.1
+- live-bootstrap/gcc:4.7.4
+- live-bootstrap/binutils:2.41-pass1
+- live-bootstrap/grep:3.7
+- live-bootstrap/sed:4.8
+- live-bootstrap/autogen:5.18.16
+build:
+  unpack_dirname: musl-1.2.4
+  patch_dir: patches-pass2
+  configure:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - ./configure --host=i386-unknown-linux-musl --prefix="${PREFIX}" --libdir="${LIBDIR}"
+    --includedir="${PREFIX}/include/"
+  compile:
+  - make "${MAKEJOBS}" CROSS_COMPILE=
+  install:
+  - default
+  - rm "${DESTDIR}/lib/ld-musl-i386.so.1"
+  - rmdir "${DESTDIR}/lib"
+  - mkdir -p "${DESTDIR}${PREFIX}/lib"
+  - ln -sr "${DESTDIR}${LIBDIR}/libc.so" "${DESTDIR}${PREFIX}/lib/ld-musl-i386.so.1"
+  - ln -sr "${DESTDIR}${LIBDIR}/crt1.o" "${DESTDIR}${PREFIX}/lib/crt1.o"
+  - ln -sr "${DESTDIR}${LIBDIR}/crti.o" "${DESTDIR}${PREFIX}/lib/crti.o"
+  - ln -sr "${DESTDIR}${LIBDIR}/crtn.o" "${DESTDIR}${PREFIX}/lib/crtn.o"
+  - ln -sr "${DESTDIR}${LIBDIR}/Scrt1.o" "${DESTDIR}${PREFIX}/lib/Scrt1.o"
+  - ln -sr "${DESTDIR}${LIBDIR}/rcrt1.o" "${DESTDIR}${PREFIX}/lib/rcrt1.o"
+  - mkdir -p "${DESTDIR}${PREFIX}/bin"
+  - ln -s ../lib/ld-musl-i386.so.1 "${DESTDIR}${PREFIX}/bin/ldd"
+  - mkdir -p "${DESTDIR}/etc"
+  - cp ld-musl-i386.path "${DESTDIR}/etc"
+  postprocess: []
+artefacts:
+- external/repo/musl-1.2.4_2.tar.bz2

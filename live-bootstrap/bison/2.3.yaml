@@ -1,0 +1,67 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 
+      - 2021 fosslinux <fosslinux@aussies.space>
+      - 2022 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  bison-2.3:
+    noextract: /external/distfiles/bison-2.3.tar.bz2
+  gnulib-b28236b:
+    noextract: /external/distfiles/gnulib-b28236b.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/bison-2.3
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/binutils:2.30
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/file:5.44
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/make:4.2.1
+- live-bootstrap/flex:2.5.33
+build:
+  unpack_dirname: bison-2.3
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - ../../import-gnulib.sh
+  - cmd: AUTOPOINT=true AUTOMAKE=automake-1.15 ACLOCAL=aclocal-1.15 autoreconf-2.69
+      -fi
+    bash: true
+  - rm src/parse-gram.c src/parse-gram.h src/scan-skel.c src/scan-gram.c
+  - rm doc/bison.info
+  configure:
+  - cmd: LEX=flex-2.5.33 ./configure --prefix="${PREFIX}" --libdir="${LIBDIR}" --program-suffix=-2.3
+      --datarootdir="${PREFIX}/share/bison-2.3"
+    bash: true
+  compile:
+  - make -j1 MAKEINFO=true
+  install:
+  - make MAKEINFO=true DESTDIR="${DESTDIR}" install
+artefacts:
+- /external/repo/bison-2.3_0.tar.bz2

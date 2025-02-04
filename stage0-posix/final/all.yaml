@@ -6,7 +6,7 @@ licenses:
 deps:
   - stage0-posix/mescc-tools-extra/mescc-tools-extra:latest
   - stage0-posix/mescc-tools-full-kaem/blood-elf:latest
-  - stage0-posix/mescc-tools-full-kaem/get_machine:latest
+  - stage0-posix/mescc-tools-full-kaem/get-machine:latest
   - stage0-posix/mescc-tools-full-kaem/m2-mesoplanet:latest
   - stage0-posix/mescc-tools-full-kaem/m2-planet:latest
   - stage0-posix/mescc-tools-mini-kaem/hex2:latest

@@ -1,0 +1,65 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+      - 2022 fosslinux <fosslinux@aussies.space>
+source:
+  libtool-2.2.4:
+    noextract: /external/distfiles/libtool-2.2.4.tar.lzma
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/libtool-2.2.4
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:unxz
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/tar:1.12
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/tcc:0.9.27-pass2
+- live-bootstrap/musl:1.1.24-pass2
+- live-bootstrap/tcc:0.9.27-pass3
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/grep:2.4
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/autoconf:2.61
+- live-bootstrap/automake:1.10.3
+build:
+  unpack_dirname: libtool-2.2.4
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - rm -f libltdl/config/ltmain.sh libtool
+  - cmd: rm -f doc/*.info
+    bash: true
+  - cmd: AUTOMAKE=automake-1.10 ACLOCAL=aclocal-1.10 AUTOM4TE=autom4te-2.61 AUTOCONF=autoconf-2.61
+      AUTOHEADER=autoheader-2.61 AUTORECONF=autoreconf-2.61 ./bootstrap
+    bash: true
+  configure:
+  - cmd: LD=tcc CC=tcc AR="true" RANLIB=true ./configure --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --disable-shared --disable-ltdl-install --host=i386-unknown-linux --target=i386-unknown-linux
+      --build=i386-unknown-linux ac_path_EGREP="egrep" ac_path_FGREP="fgrep" ac_path_GREP="grep"
+      ac_path_SED="sed"
+    bash: true
+  compile:
+  - make "${MAKEJOBS}" AUTOM4TE=autom4te-2.61 MAKEINFO=true
+  install:
+  - make install MAKEINFO=true DESTDIR="${DESTDIR}"
+  - sed -i -e "s/{EGREP=.*/{EGREP='egrep'}/" -e "s/{FGREP=.*/{FREGP='fgrep'}/" -e
+    "s/{GREP=.*/{GREP='grep'}/" -e "s/{SED=.*/{SED='sed'}/" "${DESTDIR}/usr/bin/libtool"
+artefacts:
+- /external/repo/libtool-2.2.4_0.tar.bz2

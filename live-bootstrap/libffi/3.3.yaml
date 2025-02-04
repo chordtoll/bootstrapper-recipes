@@ -1,0 +1,55 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 2022 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  libffi-3.3:
+    noextract: /external/distfiles/libffi-3.3.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/libffi-3.3
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- live-bootstrap/gzip:1.2.4
+- stage0-posix/final:sha256sum
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/file:5.44
+- live-bootstrap/libtool:2.4.7
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/make:4.2.1
+- live-bootstrap/flex:2.5.33
+- live-bootstrap/perl:5.32.1
+- live-bootstrap/automake:1.16.3
+- live-bootstrap/autoconf:2.71
+- live-bootstrap/texinfo:6.7
+- live-bootstrap/gcc:4.7.4
+- live-bootstrap/binutils:2.41-pass1
+build:
+  unpack_dirname: libffi-3.3
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - find . -name '*.info*' -delete
+  - autoreconf-2.71 -fi
+  configure:
+  - ./configure --prefix="${PREFIX}" --libdir="${LIBDIR}" --build=i386-unknown-linux-musl
+    --disable-shared --with-gcc-arch=generic --enable-pax_emutramp
+artefacts:
+- /external/repo/libffi-3.3_0.tar.bz2

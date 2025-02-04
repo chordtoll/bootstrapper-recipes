@@ -1,0 +1,62 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2021-23 fosslinux <fosslinux@aussies.space>
+source:
+  util-linux-2.19.1:
+    noextract: /external/distfiles/util-linux-2.19.1.tar.xz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/util-linux-2.19.1
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- stage0-posix/final:unxz
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/tar:1.12
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/automake:1.10.3
+- live-bootstrap/autoconf:2.64
+- live-bootstrap/libtool:2.2.4
+- live-bootstrap/binutils:2.30
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/musl:1.2.4-pass1
+- live-bootstrap/linux-headers:4.14.341-openela
+- live-bootstrap/gcc:4.0.4-pass2
+build:
+  unpack_dirname: util-linux-2.19.1
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - cmd: AUTOPOINT=true AUTOMAKE=automake-1.10 AUTOCONF=autoconf-2.64 ACLOCAL=aclocal-1.10
+      AUTOM4TE=autom4te-2.64 autoreconf-2.64 -fi
+    bash: true
+  configure:
+  - ./configure --prefix="${PREFIX}" --bindir="${PREFIX}/bin" --sbindir="${PREFIX}/bin"
+    --libdir="${LIBDIR}" --build=i386-unknown-linux-gnu --disable-cramfs --without-ncurses
+    --enable-static --enable-static-programs=losetup,mount,umount,fdisk,sfdisk,blkid
+    --enable-shared=no --disable-wall ac_cv_type_loff_t=yes
+  install:
+  - default
+  - cmd: mv ${DESTDIR}${PREFIX}/i386-unknown-linux-musl/* ${DESTDIR}${LIBDIR}/
+    bash: true
+  - rmdir "${DESTDIR}${PREFIX}/i386-unknown-linux-musl/"
+artefacts:
+- external/repo/util-linux-2.19.1_0.tar.bz2

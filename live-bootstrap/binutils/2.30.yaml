@@ -1,0 +1,189 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 
+      - 2022 Dor Askayo <dor.askayo@gmail.com>
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+      - 2021 Paul Dersey <pdersey@gmail.com>
+      - 2023 fosslinux <fosslinux@aussies.space>
+source:
+  binutils-2.30:
+    noextract: /external/distfiles/binutils-2.30.tar.xz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/binutils-2.30
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- stage0-posix/final:unxz
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/tar:1.12
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/tcc:0.9.27-pass2
+- live-bootstrap/musl:1.1.24-pass2
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/flex:2.6.4
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/autoconf:2.64
+- live-bootstrap/automake:1.11.2
+- live-bootstrap/libtool:2.2.4
+build:
+  unpack_dirname: binutils-2.30
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - rm etc/Makefile.in etc/configure
+  - cmd: cd bfd && AUTOPOINT=true ACLOCAL=aclocal-1.11 AUTOMAKE=automake-1.11 autoreconf-2.64
+      -fi
+    bash: true
+  - cmd: cd binutils && AUTOPOINT=true ACLOCAL=aclocal-1.11 AUTOMAKE=automake-1.11
+      autoreconf-2.64 -fi
+    bash: true
+  - cmd: cd gas && AUTOPOINT=true ACLOCAL=aclocal-1.11 AUTOMAKE=automake-1.11 autoreconf-2.64
+      -fi
+    bash: true
+  - cmd: cd gprof && AUTOPOINT=true ACLOCAL=aclocal-1.11 AUTOMAKE=automake-1.11 autoreconf-2.64
+      -fi
+    bash: true
+  - cmd: cd intl && AUTOPOINT=true ACLOCAL=aclocal-1.11 AUTOMAKE=automake-1.11 autoreconf-2.64
+      -fi
+    bash: true
+  - cmd: cd ld && AUTOPOINT=true ACLOCAL=aclocal-1.11 AUTOMAKE=automake-1.11 autoreconf-2.64
+      -fi
+    bash: true
+  - cmd: cd libiberty && AUTOPOINT=true ACLOCAL=aclocal-1.11 AUTOMAKE=automake-1.11
+      autoreconf-2.64 -fi
+    bash: true
+  - cmd: cd opcodes && AUTOPOINT=true ACLOCAL=aclocal-1.11 AUTOMAKE=automake-1.11
+      autoreconf-2.64 -fi
+    bash: true
+  - cmd: cd zlib && AUTOPOINT=true ACLOCAL=aclocal-1.11 AUTOMAKE=automake-1.11 autoreconf-2.64
+      -fi
+    bash: true
+  - ACLOCAL=aclocal-1.11 autoreconf-2.64 -fi
+  - cmd: touch -- */*.y
+    bash: true
+  - rm binutils/arparse.c binutils/arparse.h
+  - rm binutils/defparse.c binutils/defparse.h
+  - rm binutils/mcparse.c binutils/mcparse.h
+  - rm binutils/rcparse.c binutils/rcparse.h
+  - rm binutils/sysinfo.c binutils/sysinfo.h
+  - rm gas/bfin-parse.c gas/bfin-parse.h
+  - rm gas/m68k-parse.c gas/rl78-parse.c
+  - rm gas/rl78-parse.h gas/rx-parse.c
+  - rm gas/rx-parse.h gas/itbl-parse.c
+  - rm gas/itbl-parse.h gold/yyscript.c
+  - rm gold/yyscript.h intl/plural.c
+  - rm ld/deffilep.c ld/deffilep.h
+  - rm ld/ldgram.c ld/ldgram.h
+  - cmd: touch -- */*.l */*/*.l
+    bash: true
+  - rm binutils/arlex.c binutils/deflex.c binutils/syslex.c
+  - rm gas/bfin-lex.c gas/itbl-lex.c
+  - rm ld/ldlex.c
+  - rm bfd/doc/bfd.info binutils/doc/binutils.info
+  - rm gas/doc/as.info gprof/gprof.info ld/ld.info
+  - rm opcodes/i386-init.h opcodes/i386-tbl.h
+  - rm opcodes/ia64-asmtab.c
+  - rm opcodes/z8k-opc.h
+  - rm opcodes/aarch64-asm-2.c opcodes/aarch64-opc-2.c opcodes/aarch64-dis-2.c
+  - cmd: rm $(grep -l "MACHINE GENERATED" opcodes/*.c opcodes/*.h)
+    bash: true
+  - ./bfd/mep-relocs.pl
+  - cmd: rm */*.1 */*/*.1 */*/*.man
+    bash: true
+  configure:
+  - cmd: cd intl && LD="true" AR="tcc -ar" CC="tcc" ./configure --disable-nls --enable-deterministic-archives
+      --enable-64-bit-bfd --build=i386-unknown-linux-gnu --host=i386-unknown-linux-gnu
+      --target=i386-unknown-linux-gnu --program-prefix="" --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --with-sysroot= --srcdir=. --enable-compressed-debug-sections=all lt_cv_sys_max_cmd_len=32768
+    bash: true
+  - cmd: cd libiberty && LD="true" AR="tcc -ar" CC="tcc" ./configure --disable-nls
+      --enable-deterministic-archives --enable-64-bit-bfd --build=i386-unknown-linux-gnu
+      --host=i386-unknown-linux-gnu --target=i386-unknown-linux-gnu --program-prefix=""
+      --prefix="${PREFIX}" --libdir="${LIBDIR}" --with-sysroot= --srcdir=. --enable-compressed-debug-sections=all
+      lt_cv_sys_max_cmd_len=32768
+    bash: true
+  - cmd: cd opcodes && LD="true" AR="tcc -ar" CC="tcc" ./configure --disable-nls --enable-deterministic-archives
+      --enable-64-bit-bfd --build=i386-unknown-linux-gnu --host=i386-unknown-linux-gnu
+      --target=i386-unknown-linux-gnu --program-prefix="" --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --with-sysroot= --srcdir=. --enable-compressed-debug-sections=all lt_cv_sys_max_cmd_len=32768
+    bash: true
+  - cmd: cd bfd && LD="true" AR="tcc -ar" CC="tcc" ./configure --disable-nls --enable-deterministic-archives
+      --enable-64-bit-bfd --build=i386-unknown-linux-gnu --host=i386-unknown-linux-gnu
+      --target=i386-unknown-linux-gnu --program-prefix="" --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --with-sysroot= --srcdir=. --enable-compressed-debug-sections=all lt_cv_sys_max_cmd_len=32768
+    bash: true
+  - cmd: cd binutils && LD="true" AR="tcc -ar" CC="tcc" ./configure --disable-nls
+      --enable-deterministic-archives --enable-64-bit-bfd --build=i386-unknown-linux-gnu
+      --host=i386-unknown-linux-gnu --target=i386-unknown-linux-gnu --program-prefix=""
+      --prefix="${PREFIX}" --libdir="${LIBDIR}" --with-sysroot= --srcdir=. --enable-compressed-debug-sections=all
+      lt_cv_sys_max_cmd_len=32768
+    bash: true
+  - cmd: cd gas && LD="true" AR="tcc -ar" CC="tcc" ./configure --disable-nls --enable-deterministic-archives
+      --enable-64-bit-bfd --build=i386-unknown-linux-gnu --host=i386-unknown-linux-gnu
+      --target=i386-unknown-linux-gnu --program-prefix="" --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --with-sysroot= --srcdir=. --enable-compressed-debug-sections=all lt_cv_sys_max_cmd_len=32768
+    bash: true
+  - cmd: cd gprof && LD="true" AR="tcc -ar" CC="tcc" ./configure --disable-nls --enable-deterministic-archives
+      --enable-64-bit-bfd --build=i386-unknown-linux-gnu --host=i386-unknown-linux-gnu
+      --target=i386-unknown-linux-gnu --program-prefix="" --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --with-sysroot= --srcdir=. --enable-compressed-debug-sections=all lt_cv_sys_max_cmd_len=32768
+    bash: true
+  - cmd: cd ld && LD="true" AR="tcc -ar" CC="tcc" ./configure --disable-nls --enable-deterministic-archives
+      --enable-64-bit-bfd --build=i386-unknown-linux-gnu --host=i386-unknown-linux-gnu
+      --target=i386-unknown-linux-gnu --program-prefix="" --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --with-sysroot= --srcdir=. --enable-compressed-debug-sections=all lt_cv_sys_max_cmd_len=32768
+    bash: true
+  - cmd: cd zlib && LD="true" AR="tcc -ar" CC="tcc" ./configure --disable-nls --enable-deterministic-archives
+      --enable-64-bit-bfd --build=i386-unknown-linux-gnu --host=i386-unknown-linux-gnu
+      --target=i386-unknown-linux-gnu --program-prefix="" --prefix="${PREFIX}" --libdir="${LIBDIR}"
+      --with-sysroot= --srcdir=. --enable-compressed-debug-sections=all lt_cv_sys_max_cmd_len=32768
+    bash: true
+  compile:
+  - make -C bfd headers
+  - make "${MAKEJOBS}" -C libiberty tooldir=${PREFIX} CPPFLAGS="-DPLUGIN_LITTLE_ENDIAN"
+    MAKEINFO=true
+  - make "${MAKEJOBS}" -C zlib tooldir=${PREFIX} CPPFLAGS="-DPLUGIN_LITTLE_ENDIAN"
+    MAKEINFO=true
+  - make "${MAKEJOBS}" -C bfd tooldir=${PREFIX} CPPFLAGS="-DPLUGIN_LITTLE_ENDIAN"
+    MAKEINFO=true
+  - make "${MAKEJOBS}" -C opcodes tooldir=${PREFIX} CPPFLAGS="-DPLUGIN_LITTLE_ENDIAN"
+    MAKEINFO=true
+  - make "${MAKEJOBS}" -C binutils tooldir=${PREFIX} CPPFLAGS="-DPLUGIN_LITTLE_ENDIAN"
+    MAKEINFO=true
+  - make "${MAKEJOBS}" -C gas tooldir=${PREFIX} CPPFLAGS="-DPLUGIN_LITTLE_ENDIAN"
+    MAKEINFO=true
+  - make "${MAKEJOBS}" -C gprof tooldir=${PREFIX} CPPFLAGS="-DPLUGIN_LITTLE_ENDIAN"
+    MAKEINFO=true
+  - make "${MAKEJOBS}" -C ld tooldir=${PREFIX} CPPFLAGS="-DPLUGIN_LITTLE_ENDIAN" MAKEINFO=true
+  install:
+  - make -C libiberty tooldir=${PREFIX} DESTDIR="${DESTDIR}" install MAKEINFO=true
+  - make -C zlib tooldir=${PREFIX} DESTDIR="${DESTDIR}" install MAKEINFO=true
+  - make -C bfd tooldir=${PREFIX} DESTDIR="${DESTDIR}" install MAKEINFO=true
+  - make -C opcodes tooldir=${PREFIX} DESTDIR="${DESTDIR}" install MAKEINFO=true
+  - make -C binutils tooldir=${PREFIX} DESTDIR="${DESTDIR}" install MAKEINFO=true
+  - make -C gas tooldir=${PREFIX} DESTDIR="${DESTDIR}" install MAKEINFO=true
+  - make -C gprof tooldir=${PREFIX} DESTDIR="${DESTDIR}" install MAKEINFO=true
+  - make -C ld tooldir=${PREFIX} DESTDIR="${DESTDIR}" install MAKEINFO=true
+  - cmd: cd "${DESTDIR}${PREFIX}/bin" && for f in *; do ln -s "${PREFIX}/bin/${f}"
+      "i386-unknown-linux-musl-${f}"; done
+    bash: true
+artefacts:
+- /external/repo/binutils-2.30_0.tar.bz2

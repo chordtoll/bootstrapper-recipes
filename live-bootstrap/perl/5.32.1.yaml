@@ -1,0 +1,82 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2022 Andrius Štikonas <andrius@stikonas.eu>
+      - 2022 fosslinux <fosslinux@aussies.space>
+source:
+  perl-5.32.1:
+    noextract: /external/distfiles/perl-5.32.1.tar.xz
+  perl_5.32.1.orig-regen-configure:
+    noextract: /external/distfiles/perl_5.32.1.orig-regen-configure.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/perl-5.32.1
+mkdirs:
+- /external/repo
+- /tmp
+- /etc
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- stage0-posix/final:unxz
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/heirloom-devtools:070527
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/binutils:2.30
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/make:4.2.1
+- live-bootstrap/bison:3.4.2
+- live-bootstrap/perl:5.10.1
+- live-bootstrap/dist:3.5-236
+build:
+  unpack_dirname: perl-5.32.1
+  patch_dir: patches
+  prepare:
+  - default
+  - cmd: echo "root:x:0:0::/root:/bin/bash" > /etc/passwd
+    bash: true
+  - cmd: echo "root:x:0:root" > /etc/group
+    bash: true
+  - touch /etc/group
+  - perl regen_perly.pl
+  - rm -f embed.h embedvar.h perlapi.c perlapi.h proto.h mg_names.inc mg_raw.h mg_vtable.h
+    opcode.h opnames.h pp_proto.h lib/B/Op_private.pm overload.h overload.inc lib/overload/numbers.pm
+    reentr.h reentr.c regnodes.h lib/warnings.pm warnings.h lib/feature.pm feature.h
+  - perl regen.pl
+  - rm -f Configure config_h.SH
+  - ln -s ../metaconfig-5.32.1\~rc1/.package .
+  - ln -s ../metaconfig-5.32.1\~rc1/U .
+  - cmd: metaconfig -m
+    bash: true
+  configure:
+  - ./Configure -des -Dprefix="${PREFIX}" -Dcc=gcc -Dusedl=false -Ddate=':' -Dccflags="-U__DATE__
+    -U__TIME__" -Darchname="i386-linux" -Dmyhostname="(none)" -Dmaildomain="(none)"
+  install:
+  - default
+  - cmd: rm "${DESTDIR}/"*.0
+    bash: true
+  - rm "${DESTDIR}${PREFIX}/lib/perl5/5.32.1/pod/perldebguts.pod"
+  - sed -i "s_^hostcat='.*'\$_hostcat=''_g" "${DESTDIR}${PREFIX}/lib/perl5/5.32.1/i386-linux/Config_heavy.pl"
+  - find "${DESTDIR}${PREFIX}/lib" -type f  -exec chmod 644 {} \;
+artefacts:
+- /external/repo/perl-5.32.1_0.tar.bz2

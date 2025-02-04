@@ -1,0 +1,127 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner: 2021 fosslinux <fosslinux@aussies.space>
+source:
+  libarchive-3.5.2:
+    noextract: /external/distfiles/libarchive-3.5.2.tar.xz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/libarchive-3.5.2
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/mes:0.26
+- live-bootstrap/simple-patch:1.0
+- live-bootstrap/tcc:0.9.26
+- live-bootstrap/tcc:0.9.27-pass0
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/tar:1.12
+- live-bootstrap/bzip2:1.0.8-pass0
+- live-bootstrap/sed:4.0.9-pass0
+- live-bootstrap/coreutils:5.0-pass0
+- live-bootstrap/byacc:20240109
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/tcc:0.9.27-pass1
+- live-bootstrap/musl:1.1.24-pass1
+- live-bootstrap/tcc:0.9.27-pass2
+- live-bootstrap/musl:1.1.24-pass2
+- live-bootstrap/tcc:0.9.27-pass3
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/heirloom-devtools:070527
+- live-bootstrap/flex:2.5.11
+- live-bootstrap/m4:1.4.7
+- live-bootstrap/flex:2.6.4
+- live-bootstrap/bison:3.4.1-pass1
+- live-bootstrap/bison:3.4.1-pass2
+- live-bootstrap/bison:3.4.1-pass3
+- live-bootstrap/coreutils:5.0-pass1
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/autoconf:2.52
+- live-bootstrap/automake:1.6.3-pass1
+- live-bootstrap/diffutils:2.7
+- live-bootstrap/gawk:3.0.4
+- live-bootstrap/grep:2.4
+- live-bootstrap/perl:5.000
+- live-bootstrap/perl:5.003
+- live-bootstrap/perl:5.004-05
+- live-bootstrap/perl:5.005-03
+- live-bootstrap/perl:5.6.2
+- live-bootstrap/automake:1.6.3-pass2
+- live-bootstrap/autoconf:2.53
+- live-bootstrap/automake:1.7
+- live-bootstrap/autoconf:2.54
+- live-bootstrap/autoconf:2.55
+- live-bootstrap/automake:1.7.8
+- live-bootstrap/autoconf:2.57
+- live-bootstrap/autoconf:2.59
+- live-bootstrap/automake:1.8.5
+- live-bootstrap/help2man:1.36.4
+- live-bootstrap/autoconf:2.61
+- live-bootstrap/automake:1.9.6
+- live-bootstrap/automake:1.10.3
+- live-bootstrap/autoconf:2.64
+- live-bootstrap/automake:1.11.2
+- live-bootstrap/autoconf:2.69
+- live-bootstrap/automake:1.15.1
+- live-bootstrap/libtool:2.2.4
+- live-bootstrap/binutils:2.30
+- live-bootstrap/musl:1.1.24-pass3
+- live-bootstrap/tcc:0.9.27-pass4
+- live-bootstrap/gcc:4.0.4-pass1
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/musl:1.2.4-pass1
+- live-bootstrap/linux-headers:4.14.341-openela
+- live-bootstrap/gcc:4.0.4-pass2
+- live-bootstrap/make:3.82-pass1
+- live-bootstrap/musl:1.2.4-pass2
+- live-bootstrap/bash:5.2.15
+- live-bootstrap/xz:5.4.1
+- live-bootstrap/file:5.44
+- live-bootstrap/ed:1.4
+- live-bootstrap/bc:1.07.1
+- live-bootstrap/util-linux:2.19.1
+- live-bootstrap/libtool:2.4.7
+- live-bootstrap/tar:1.34
+- live-bootstrap/coreutils:9.4
+- live-bootstrap/pkg-config:0.29.2
+- live-bootstrap/make:4.2.1
+- live-bootstrap/autoconf-archive:2021.02.19
+- live-bootstrap/flex:2.5.33
+- live-bootstrap/bison:2.3
+- live-bootstrap/bison:3.4.2
+- live-bootstrap/perl:5.10.1
+- live-bootstrap/dist:3.5-236
+- live-bootstrap/gmp:6.2.1
+- live-bootstrap/perl:5.32.1
+- live-bootstrap/mpfr:4.1.0
+- live-bootstrap/mpc:1.2.1
+build:
+  unpack_dirname: libarchive-3.5.2
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - cmd: AUTOMAKE=automake-1.15 ACLOCAL=aclocal-1.15 autoreconf-2.69 -fi
+    bash: true
+  configure:
+  - ./configure --prefix="${PREFIX}" --libdir="${LIBDIR}" --disable-shared
+  compile:
+  - make "${MAKEJOBS}" MAKEINFO=true
+  install:
+  - make MAKEINFO=true DESTDIR="${DESTDIR}" install
+  - cp /output-patch/usr/bin/bsdcpio /tmp/destdir/usr/bin/bsdcpio
+  - cp /output-patch/usr/bin/bsdtar /tmp/destdir/usr/bin/bsdtar
+  - cp /output-patch/usr/lib/i386-unknown-linux-musl/libarchive.a /tmp/destdir/usr/lib/i386-unknown-linux-musl/libarchive.a
+artefacts:
+- /external/repo/libarchive-3.5.2_0.tar.bz2

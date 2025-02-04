@@ -1,0 +1,44 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  sed-4.0.9:
+    noextract: /external/distfiles/sed-4.0.9.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/sed-4.0.9
+mkdirs:
+- /external/repo
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/mes:0.26
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/tar:1.12
+- live-bootstrap/bzip2:1.0.8-pass0
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/sed:4.0.9-pass0
+- live-bootstrap/coreutils:5.0-pass0
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/musl:1.1.24-pass2
+- live-bootstrap/tcc:0.9.27-pass1
+- live-bootstrap/tcc:0.9.27-pass2
+- live-bootstrap/tcc:0.9.27-pass3
+build:
+  unpack_dirname: sed-4.0.9
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - touch config.h
+  compile:
+  - make "${MAKEJOBS}" PREFIX="${PREFIX}"
+artefacts:
+- external/repo/sed-4.0.9_0.tar.bz2

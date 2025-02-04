@@ -1,0 +1,77 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2021-23 fosslinux <fosslinux@aussies.space>
+      - 2022 Andrius Štikonas <andrius@stikonas.eu>
+source:
+  linux-4.14.336:
+    noextract: /external/distfiles/linux-4.14.336.tar.gz
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/linux-headers-4.14.341-openela
+mkdirs:
+- /external/repo
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/gzip:1.2.4
+- live-bootstrap/tar:1.12
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/sed:4.0.9-pass1
+- live-bootstrap/bzip2:1.0.8-pass1
+- live-bootstrap/coreutils:6.10
+- live-bootstrap/grep:2.4
+- live-bootstrap/binutils:2.30
+- live-bootstrap/gcc:4.0.4-pass1
+- live-bootstrap/findutils:4.2.33
+- live-bootstrap/musl:1.2.4-pass1
+build:
+  unpack_dirname: linux-4.14.336
+  patch_dir: patches
+  prepare:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - default
+  - rm include/uapi/linux/pktcdvd.h include/uapi/linux/hw_breakpoint.h include/uapi/linux/eventpoll.h include/uapi/linux/atmdev.h include/uapi/asm-generic/fcntl.h arch/x86/include/uapi/asm/mman.h arch/x86/include/uapi/asm/auxvec.h
+  compile:
+  - gcc -o scripts/unifdef scripts/unifdef.c
+  install:
+  - base_dir=/steps/linux-headers-4.14.341/build/linux-4.14.341
+  - cd include/uapi
+  - find . -type d -exec mkdir "${DESTDIR}${PREFIX}/include/{}" -p \;
+  - cmd: headers="$(find . -type f -name "*.h")"; cd ../..; for h in ${headers}; do path="$(dirname "${h}")"; scripts/headers_install.sh "${DESTDIR}${PREFIX}/include/${path}" "include/uapi/${path}" "$(basename "${h}")"; done
+    bash: true
+  - cd ../..
+  - cd arch/x86/include/uapi
+  - find . -type d -exec mkdir "${DESTDIR}${PREFIX}/include/{}" -p \;
+  - cmd: headers="$(find . -type f -name "*.h")"; cd ../../../..; for h in ${headers}; do path="$(dirname "${h}")"; scripts/headers_install.sh "${DESTDIR}${PREFIX}/include/${path}" "arch/x86/include/uapi/${path}" "$(basename "${h}")"; done
+    bash: true
+  - cd ../../../..
+  - cp "${DESTDIR}${PREFIX}/include/asm-generic/types.h" "${DESTDIR}${PREFIX}/include/asm/types.h"
+  - cp "${DESTDIR}${PREFIX}/include/asm-generic/ioctl.h" "${DESTDIR}${PREFIX}/include/asm/ioctl.h"
+  - cp "${DESTDIR}${PREFIX}/include/asm-generic/termios.h" "${DESTDIR}${PREFIX}/include/asm/termios.h"
+  - cp "${DESTDIR}${PREFIX}/include/asm-generic/termbits.h" "${DESTDIR}${PREFIX}/include/asm/termbits.h"
+  - cp "${DESTDIR}${PREFIX}/include/asm-generic/ioctls.h" "${DESTDIR}${PREFIX}/include/asm/ioctls.h"
+  - cp "${DESTDIR}${PREFIX}/include/asm-generic/sockios.h" "${DESTDIR}${PREFIX}/include/asm/sockios.h"
+  - cp "${DESTDIR}${PREFIX}/include/asm-generic/socket.h" "${DESTDIR}${PREFIX}/include/asm/socket.h"
+  - cp "${DESTDIR}${PREFIX}/include/asm-generic/param.h" "${DESTDIR}${PREFIX}/include/asm/param.h"
+  - bash arch/x86/entry/syscalls/syscallhdr.sh arch/x86/entry/syscalls/syscall_32.tbl "${DESTDIR}${PREFIX}/include/asm/unistd_32.h" i386
+  - VERSION=4
+  - PATCHLEVEL=14
+  - SUBLEVEL=336
+  - VERSION_CODE=266064 # $((VERSION * 65536 + PATCHLEVEL * 256 + SUBLEVEL))
+  - cmd: |
+          echo "#define LINUX_VERSION_CODE ${VERSION_CODE}" > "${DESTDIR}${PREFIX}/include/linux/version.h"
+    bash: true
+  - cmd: |
+          echo "#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + ((c) > 255 ? 255 : (c)))" >> "${DESTDIR}${PREFIX}/include/linux/version.h"
+    bash: true
+artefacts:
+- external/repo/linux-headers-4.14.341-openela_0.tar.bz2

@@ -1,0 +1,50 @@
+licenses:
+  recipe:
+    spdx: GPL-3.0-or-later
+    license_file: GPL-3.0-or-later.txt
+    owner:
+      - 2021 Andrius Štikonas <andrius@stikonas.eu>
+      - 2021-22 fosslinux <fosslinux@aussies.space>
+      - 2024 Gábor Stefanik <netrolller.3d@gmail.com>
+source:
+  heirloom-devtools-070527:
+    noextract: /external/distfiles/heirloom-devtools-070527.tar.bz2
+  live-bootstrap:
+    extract: /
+    copy:
+    - /steps/helpers.sh
+    - /steps/SHA256SUMS.pkgs
+    - /steps/heirloom-devtools-070527
+mkdirs:
+- /tmp
+deps:
+- stage0-posix/final:sha256sum
+- live-bootstrap/mes:0.26
+- live-bootstrap/tcc:0.9.27-pass0
+- live-bootstrap/make:3.82-pass0
+- live-bootstrap/patch:2.5.9
+- live-bootstrap/tar:1.12
+- live-bootstrap/bzip2:1.0.8-pass0
+- live-bootstrap/sed:4.0.9-pass0
+- live-bootstrap/coreutils:5.0-pass0
+- live-bootstrap/byacc:20240109
+- live-bootstrap/bash:2.05b
+- live-bootstrap/improvements:merged_usr
+- live-bootstrap/tcc:0.9.27-pass2
+- live-bootstrap/musl:1.1.24-pass2
+build:
+  unpack_dirname: heirloom-devtools-070527
+  patch_dir: patches
+  compile:
+  - LIBDIR=${PREFIX}/lib/i386-unknown-linux-musl
+  - cd lex
+  - make -f Makefile.mk CC=tcc AR="tcc -ar" LDFLAGS=-static RANLIB=true LIBDIR="${LIBDIR}"
+  - cd ..
+  install:
+  - mkdir -p "${DESTDIR}${BINDIR}" "${DESTDIR}${LIBDIR}/lex"
+  - install lex/lex "${DESTDIR}${BINDIR}"
+  - install lex/libl.a "${DESTDIR}${LIBDIR}"
+  - install -m 644 lex/ncform "${DESTDIR}${LIBDIR}/lex"
+artefacts:
+- /external/repo/heirloom-devtools-070527_0.tar.bz2
+- /usr/bin/yacc
